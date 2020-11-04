@@ -1,13 +1,39 @@
 ﻿@page "/map"
+@using Microsoft.AspNetCore.SignalR.Client
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime;
+@implements IAsyncDisposable
 
 <h3>MapComponent</h3>
 @_count
 
 <img @ref="_myImage" src="/favicon.ico" hidden />
 
-<div @ref="_divCanvas" @onclick="OnClick" @onmousemove="OnMouseMove">
-    <BECanvas @ref="_myCanvas" Height="600" Width="600"></BECanvas>
+<div style="width: 700px; height: 700px; overflow-y: scroll;">
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    <div @ref="_divCanvas" @onclick="OnClickAsync" @onmousemove="OnMouseMoveAsync"
+            style="background-color: yellow">
+        <BECanvas @ref="_myCanvas" Height="600" Width="600"></BECanvas>
+    </div>
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    test<br />
+    test<br />
 </div>
+
 
 
 @code {
@@ -18,12 +44,54 @@
 
     private int _count;
 
-    private async Task OnMouseMove(MouseEventArgs mouseEventArgs)
+
+    private HubConnection _hubConnection;
+
+    protected override async Task OnInitializedAsync()
     {
-        await OnClick(mouseEventArgs);
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        _hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            string encodedMsg = $"{user}: {message}";
+            _jsRuntime.InvokeVoidAsync("alert", $"received: {encodedMsg}")
+                .GetAwaiter().GetResult();
+        });
+
+        await _hubConnection.StartAsync();
     }
 
-    private async Task OnClick(MouseEventArgs mouseEventArgs)
+    private Task SendAsync(string user, string message) =>
+        _hubConnection.SendAsync("SendMessage", user, message);
+    public async ValueTask DisposeAsync() => await _hubConnection.DisposeAsync();
+
+
+    private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
+    {
+        await RedrawAsync(mouseEventArgs);
+    }
+
+    private async Task OnClickAsync(MouseEventArgs mouseEventArgs)
+    {
+        (double clientX, double clientY) = await GetCanvasCoordinatesAsync(mouseEventArgs);
+        await SendAsync("usr1", $"{clientX} : {clientY}");
+        await RedrawAsync(mouseEventArgs);
+    }
+
+    private async Task<(double, double)> GetCanvasCoordinatesAsync(MouseEventArgs mouseEventArgs)
+    {
+        string data = await _jsRuntime.InvokeAsync<string>("getElementOffsets",
+            new object[] { _divCanvas });
+
+        JObject offsets = (JObject)JsonConvert.DeserializeObject(data);
+        double mouseX = mouseEventArgs.ClientX - offsets.Value<double>("offsetLeft");
+        double mouseY = mouseEventArgs.ClientY - offsets.Value<double>("offsetTop");
+        return (mouseX, mouseY);
+    }
+
+    private async Task RedrawAsync(MouseEventArgs mouseEventArgs)
     {
         _count++;
         _canvasContext = await _myCanvas.CreateCanvas2DAsync();
@@ -38,7 +106,7 @@
 
 
         await _canvasContext.SaveAsync();
-        for (var i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
             await _canvasContext.SetFillStyleAsync($"#{i}F0000");
             await _canvasContext.BeginPathAsync();
