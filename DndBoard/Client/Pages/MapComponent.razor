@@ -1,56 +1,56 @@
 ﻿@page "/map"
 
 <h3>MapComponent</h3>
-@this.count
+@_count
 
-<img @ref="this.myImage" src="/favicon.ico" hidden />
+<img @ref="_myImage" src="/favicon.ico" hidden />
 
-<div @ref="this.divCanvas" @onclick="this.OnClick" @onmousemove="this.OnMouseMove">
-    <BECanvas @ref="this.myCanvas" Height="600" Width="600"></BECanvas>
+<div @ref="_divCanvas" @onclick="OnClick" @onmousemove="OnMouseMove">
+    <BECanvas @ref="_myCanvas" Height="600" Width="600"></BECanvas>
 </div>
 
 
 @code {
-    private ElementReference myImage;
-    private ElementReference divCanvas;
-    private BECanvasComponent myCanvas;
-    private Canvas2DContext canvasContext;
+    private ElementReference _myImage;
+    private ElementReference _divCanvas;
+    private BECanvasComponent _myCanvas;
+    private Canvas2DContext _canvasContext;
 
-    private int count;
+    private int _count;
 
     private async Task OnMouseMove(MouseEventArgs mouseEventArgs)
     {
-        await this.OnClick(mouseEventArgs);
+        await OnClick(mouseEventArgs);
     }
 
     private async Task OnClick(MouseEventArgs mouseEventArgs)
     {
-        this.count++;
-        this.canvasContext = await this.myCanvas.CreateCanvas2DAsync();
+        _count++;
+        _canvasContext = await _myCanvas.CreateCanvas2DAsync();
 
 
-        await this.canvasContext.ClearRectAsync(0, 0, this.myCanvas.Width, this.myCanvas.Height);
-        await this.canvasContext.SetFillStyleAsync("Red");
-        await this.canvasContext.FillRectAsync(0, 0, this.myCanvas.Width, this.myCanvas.Height);
+        await _canvasContext.ClearRectAsync(0, 0, _myCanvas.Width, _myCanvas.Height);
+        await _canvasContext.SetFillStyleAsync("Red");
+        await _canvasContext.FillRectAsync(0, 0, _myCanvas.Width, _myCanvas.Height);
 
-        await this.canvasContext.SetFillStyleAsync("Green");
-        await this.canvasContext.FillRectAsync(10, 10, this.myCanvas.Width-20, this.myCanvas.Height-20);
+        await _canvasContext.SetFillStyleAsync("Green");
+        await _canvasContext.FillRectAsync(10, 10, _myCanvas.Width-20, _myCanvas.Height-20);
 
 
-        await this.canvasContext.SaveAsync();
+        await _canvasContext.SaveAsync();
         for (var i = 0; i < 6; i++)
         {
-        await this.canvasContext.SetFillStyleAsync($"#{i}F0000");
-            await this.canvasContext.BeginPathAsync();
-            await this.canvasContext.MoveToAsync(350, 350);
-            await this.canvasContext.ArcAsync(350, 350, 200,
+            await _canvasContext.SetFillStyleAsync($"#{i}F0000");
+            await _canvasContext.BeginPathAsync();
+            await _canvasContext.MoveToAsync(350, 350);
+            await _canvasContext.ArcAsync(350, 350, 200,
                 (Math.PI / 180) * 60 * i,
                 (Math.PI / 180) * 60 * (i+1), false);
-            await this.canvasContext.ClosePathAsync();
-            await this.canvasContext.FillAsync();
+            await _canvasContext.ClosePathAsync();
+            await _canvasContext.FillAsync();
         }
-        await this.canvasContext.RestoreAsync();
+        await _canvasContext.RestoreAsync();
 
-        await this.canvasContext.DrawImageAsync(this.myImage, 22, 33);
+        await _canvasContext.DrawImageAsync(_myImage, 22, 33);
     }
 }
