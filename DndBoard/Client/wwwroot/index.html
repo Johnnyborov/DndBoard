@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
@@ -8,6 +8,15 @@
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
+    <script src="_content/Blazor.Extensions.Canvas/blazor.extensions.canvas.js"></script>
+    <script>
+        function getDivCanvasOffsets(el) {
+            var obj = {};
+            obj.offsetLeft = el.offsetLeft;
+            obj.offsetTop = el.offsetTop;
+            return JSON.stringify(obj);
+        }
+    </script>
 </head>
 
 <body>
