@@ -8,7 +8,7 @@ namespace DndBoard.Client.Helpers
 {
     public class CanvasMapRenderer
     {
-        public async Task RedrawAsync(BECanvasComponent canvas, ElementReference image)
+        public async Task RedrawTestImageAsync(BECanvasComponent canvas, ElementReference image)
         {
             Canvas2DContext context = await canvas.CreateCanvas2DAsync();
 

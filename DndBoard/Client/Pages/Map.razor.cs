@@ -34,6 +34,9 @@ namespace DndBoard.Client.Pages
         {
             await _chatHubManager.StartConnectionAsync();
             _chatHubManager.SetMessageHandler(ReceiveMessageHandler);
+
+            await _canvasMapRenderer.RedrawTestImageAsync(Canvas, _myImage);
+            _count++;
         }
 
 
@@ -46,7 +49,7 @@ namespace DndBoard.Client.Pages
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
         {
-            await _canvasMapRenderer.RedrawAsync(Canvas, _myImage);
+            await _canvasMapRenderer.RedrawTestImageAsync(Canvas, _myImage);
             _count++;
         }
 
@@ -55,7 +58,7 @@ namespace DndBoard.Client.Pages
             (double clientX, double clientY) = await GetCanvasCoordinatesAsync(mouseEventArgs);
             await _chatHubManager.SendAsync("usr1", $"{clientX} : {clientY}");
 
-            await _canvasMapRenderer.RedrawAsync(Canvas, _myImage);
+            await _canvasMapRenderer.RedrawTestImageAsync(Canvas, _myImage);
             _count++;
         }
     }
