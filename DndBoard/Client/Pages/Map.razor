@@ -2,7 +2,6 @@
 @inherits CanvasBaseComponent
 
 <h3>Map</h3>
-@_count
 
 <img @ref="_myImage" src="/favicon.ico" hidden />
 
@@ -13,8 +12,14 @@
     test<br />
     test<br />
     test<br />
-    <div @ref="DivCanvas" @onclick="OnClickAsync" @onmousemove="OnMouseMoveAsync"
-            style="background-color: yellow">
+    <div
+        @ref="DivCanvas"
+        @onmousemove="OnMouseMoveAsync"
+        @onmousedown="OnMouseDown"
+        @onmouseup="OnMouseUp"
+        @onmouseout="OnMouseOut"
+        style="background-color: yellow"
+    >
         <BECanvas @ref="Canvas" Height="600" Width="600"></BECanvas>
     </div>
     test<br />

@@ -4,7 +4,6 @@ using DndBoard.Client.BaseComponents;
 using DndBoard.Client.Helpers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
 
 namespace DndBoard.Client.Pages
 {
@@ -13,7 +12,7 @@ namespace DndBoard.Client.Pages
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable CS0649 // Uninitialized value
         private ElementReference _myImage;
-        private int _count;
+        private bool _pressed;
 #pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore CS0649 // Uninitialized value
         [Inject]
@@ -35,31 +34,30 @@ namespace DndBoard.Client.Pages
             await _chatHubManager.StartConnectionAsync();
             _chatHubManager.SetMessageHandler(ReceiveMessageHandler);
 
-            await _canvasMapRenderer.RedrawTestImageAsync(Canvas, _myImage);
-            _count++;
+            (double clientX, double clientY) = (33, 44);
+            await _canvasMapRenderer.RedrawImagesByCoords(clientX, clientY, Canvas, _myImage);
         }
 
 
-        private void ReceiveMessageHandler(string user, string message)
+        private async void ReceiveMessageHandler(string user, string message)
         {
-            string encodedMsg = $"{user}: {message}";
-            JsRuntime.InvokeVoidAsync("alert", $"received: {encodedMsg}")
-                .GetAwaiter().GetResult();
+            string[] coords = message.Split(":");
+            double clientX = double.Parse(coords[0].Trim());
+            double clientY = double.Parse(coords[1].Trim());
+            await _canvasMapRenderer.RedrawImagesByCoords(clientX, clientY, Canvas, _myImage);
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
         {
-            await _canvasMapRenderer.RedrawTestImageAsync(Canvas, _myImage);
-            _count++;
+            if (_pressed)
+            {
+                (double clientX, double clientY) = await GetCanvasCoordinatesAsync(mouseEventArgs);
+                await _chatHubManager.SendAsync("usr1", $"{clientX} : {clientY}");
+            }
         }
 
-        private async Task OnClickAsync(MouseEventArgs mouseEventArgs)
-        {
-            (double clientX, double clientY) = await GetCanvasCoordinatesAsync(mouseEventArgs);
-            await _chatHubManager.SendAsync("usr1", $"{clientX} : {clientY}");
-
-            await _canvasMapRenderer.RedrawTestImageAsync(Canvas, _myImage);
-            _count++;
-        }
+        private void OnMouseDown(MouseEventArgs mouseEventArgs) => _pressed = true;
+        private void OnMouseUp(MouseEventArgs mouseEventArgs) => _pressed = false;
+        private void OnMouseOut(MouseEventArgs mouseEventArgs) => _pressed = false;
     }
 }
