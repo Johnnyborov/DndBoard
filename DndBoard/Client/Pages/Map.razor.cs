@@ -31,11 +31,9 @@ namespace DndBoard.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await _chatHubManager.StartConnectionAsync();
+            _chatHubManager.SetupConnectionAsync();
             _chatHubManager.SetMessageHandler(ReceiveMessageHandler);
-
-            (double clientX, double clientY) = (33, 44);
-            await _canvasMapRenderer.RedrawImagesByCoords(clientX, clientY, Canvas, _myImage);
+            await _chatHubManager.StartConnectionAsync();
         }
 
 

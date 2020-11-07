@@ -15,26 +15,20 @@ namespace DndBoard.Client.Helpers
             _navigationManager = navigationManager;
         }
 
-        public async Task StartConnectionAsync()
-        {
+        public void SetupConnectionAsync() =>
             _hubConnection = SetupSignalRConnection("/chathub");
+
+        public async Task StartConnectionAsync() =>
             await _hubConnection.StartAsync();
-        }
 
-        public async Task CloseConnectionAsync()
-        {
+        public async Task CloseConnectionAsync() =>
             await _hubConnection.DisposeAsync();
-        }
 
-        public void SetMessageHandler(Action<string, string> handler)
-        {
+        public void SetMessageHandler(Action<string, string> handler) =>
             _hubConnection.On("ReceiveMessage", handler);
-        }
 
-        public async Task SendAsync(string user, string message)
-        {
+        public async Task SendAsync(string user, string message) =>
             await _hubConnection.SendAsync("SendMessage", user, message);
-        }
 
 
         private HubConnection SetupSignalRConnection(string hubUri)
