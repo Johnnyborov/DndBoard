@@ -1,5 +1,5 @@
 ﻿@page "/map"
-@inherits CanvasComponent
+@inherits CanvasBaseComponent
 
 <h3>Map</h3>
 @_count
@@ -13,9 +13,9 @@
     test<br />
     test<br />
     test<br />
-    <div @ref="_divCanvas" @onclick="OnClickAsync" @onmousemove="OnMouseMoveAsync"
+    <div @ref="DivCanvas" @onclick="OnClickAsync" @onmousemove="OnMouseMoveAsync"
             style="background-color: yellow">
-        <BECanvas @ref="_myCanvas" Height="600" Width="600"></BECanvas>
+        <BECanvas @ref="Canvas" Height="600" Width="600"></BECanvas>
     </div>
     test<br />
     test<br />

@@ -8,23 +8,23 @@ using Newtonsoft.Json.Linq;
 
 namespace DndBoard.Client.BaseComponents
 {
-    public class CanvasComponent : ComponentBase
+    public class CanvasBaseComponent : ComponentBase
     {
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable CS0649 // Uninitialized value
-        protected ElementReference _divCanvas;
-        protected BECanvasComponent _myCanvas;
+        protected ElementReference DivCanvas { get; set; }
+        protected BECanvasComponent Canvas { get; set; }
 #pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore CS0649 // Uninitialized value
         [Inject]
-        protected IJSRuntime _jsRuntime { get; set; }
+        protected IJSRuntime JsRuntime { get; set; }
 
 
         protected async Task<(double, double)> GetCanvasCoordinatesAsync(MouseEventArgs mouseEventArgs)
         {
-            string data = await _jsRuntime.InvokeAsync<string>(
+            string data = await JsRuntime.InvokeAsync<string>(
                 "getElementOffsets",
-                new object[] { _divCanvas }
+                new object[] { DivCanvas }
             );
 
             JObject offsets = (JObject)JsonConvert.DeserializeObject(data);
