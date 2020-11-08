@@ -17,6 +17,12 @@ namespace DndBoard.Client.Components
         [Inject]
         private HttpClient _httpClient { get; set; }
 
+        [JSInvokable]
+        public async Task ReloadFilesIds()
+        {
+            _filesIds = await _httpClient.GetFromJsonAsync<IEnumerable<string>>("images/getfilesids");
+            StateHasChanged();
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -33,7 +39,7 @@ namespace DndBoard.Client.Components
         {
             await _jsRuntime.InvokeAsync<string>(
                 "initializeFileInput",
-                new object[] { _files }
+                new object[] { _files, DotNetObjectReference.Create(this) }
             );
         }
     }

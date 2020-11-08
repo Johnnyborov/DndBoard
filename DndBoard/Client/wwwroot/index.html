@@ -19,7 +19,7 @@
         }
     </script>
     <script>
-        function initializeFileInput(input) {
+        function initializeFileInput(input, componentInstance) {
             input.addEventListener('change', (e) => {
                 const fd = new FormData();
                 // add all selected files
@@ -29,9 +29,8 @@
                 // create the request
                 const xhr = new XMLHttpRequest();
                 xhr.onload = () => {
-                    console.log(xhr.responseText);
                     if (xhr.status >= 200 && xhr.status < 300) {
-                        console.log('sent successfully');
+                        componentInstance.invokeMethodAsync('ReloadFilesIds');
                     }
                 };
                 // path to server would be where you'd normally post the form to
