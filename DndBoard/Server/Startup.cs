@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using DndBoard.Server.Hubs;
+using DndBoard.Shared;
 
 namespace DndBoard.Server
 {
@@ -60,7 +61,7 @@ namespace DndBoard.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<BoardsHub>(BoardsHubContract.BaseAddress);
                 endpoints.MapFallbackToFile("index.html");
             });
         }

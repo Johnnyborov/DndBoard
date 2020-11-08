@@ -10,7 +10,7 @@ namespace DndBoard.Client.Components
     {
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable CS0649 // Uninitialized value
-        private ElementReference _myImage;
+        private ElementReference _testImage;
         private bool _pressed;
 #pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore CS0649 // Uninitialized value
@@ -19,17 +19,17 @@ namespace DndBoard.Client.Components
         [Parameter]
         public ChatHubManager ChatHubManager { get; set; }
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
-            ChatHubManager.SetMessageHandler(ReceiveMessageHandler);
+            ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
         }
 
-        private async void ReceiveMessageHandler(string message)
+        private async void CoordsReceivedHandler(string message)
         {
             string[] coords = message.Split(":");
             double clientX = double.Parse(coords[0].Trim());
             double clientY = double.Parse(coords[1].Trim());
-            await _canvasMapRenderer.RedrawImagesByCoords(clientX, clientY, Canvas, _myImage);
+            await _canvasMapRenderer.RedrawImagesByCoords(clientX, clientY, Canvas, _testImage);
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)

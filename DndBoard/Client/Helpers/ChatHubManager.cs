@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DndBoard.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -17,7 +18,7 @@ namespace DndBoard.Client.Helpers
         }
 
         public void SetupConnectionAsync() =>
-            _hubConnection = SetupSignalRConnection("/chathub");
+            _hubConnection = SetupSignalRConnection(BoardsHubContract.BaseAddress);
 
         public async Task StartConnectionAsync() =>
             await _hubConnection.StartAsync();
@@ -25,16 +26,16 @@ namespace DndBoard.Client.Helpers
         public async Task CloseConnectionAsync() =>
             await _hubConnection.DisposeAsync();
 
-        public void SetMessageHandler(Action<string> handler) =>
-            _hubConnection.On("ReceiveMessage", handler);
+        public void SetCoordsReceivedHandler(Action<string> handler) =>
+            _hubConnection.On(BoardsHubContract.CoordsChanged, handler);
 
-        public async Task SendCoordsAsync(string message) =>
-            await _hubConnection.SendAsync("SendCoords", _boardId, message);
+        public async Task SendCoordsAsync(string coords) =>
+            await _hubConnection.SendAsync(BoardsHubContract.CoordsChanged, _boardId, coords);
 
         public async Task ConnectAsync(string boardId)
         {
             _boardId = boardId;
-            await _hubConnection.SendAsync("Connect", _boardId);
+            await _hubConnection.SendAsync(BoardsHubContract.Connect, _boardId);
         }
 
 
