@@ -1,13 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DndBoard.Client.BaseComponents;
 using DndBoard.Client.Helpers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
-namespace DndBoard.Client.Pages
+namespace DndBoard.Client.Components
 {
-    public partial class Map : CanvasBaseComponent, IDisposable
+    public partial class MapComponent : CanvasBaseComponent
     {
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable CS0649 // Uninitialized value
@@ -17,27 +16,15 @@ namespace DndBoard.Client.Pages
 #pragma warning restore CS0649 // Uninitialized value
         [Inject]
         private CanvasMapRenderer _canvasMapRenderer { get; set; }
-        [Inject]
-        private ChatHubManager _chatHubManager { get; set; }
-
-
-        public void Dispose()
-        {
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            _chatHubManager.CloseConnectionAsync();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-        }
-
+        [Parameter]
+        public ChatHubManager ChatHubManager { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            _chatHubManager.SetupConnectionAsync();
-            _chatHubManager.SetMessageHandler(ReceiveMessageHandler);
-            await _chatHubManager.StartConnectionAsync();
+            ChatHubManager.SetMessageHandler(ReceiveMessageHandler);
         }
 
-
-        private async void ReceiveMessageHandler(string user, string message)
+        private async void ReceiveMessageHandler(string message)
         {
             string[] coords = message.Split(":");
             double clientX = double.Parse(coords[0].Trim());
@@ -50,7 +37,7 @@ namespace DndBoard.Client.Pages
             if (_pressed)
             {
                 (double clientX, double clientY) = await GetCanvasCoordinatesAsync(mouseEventArgs);
-                await _chatHubManager.SendAsync("usr1", $"{clientX} : {clientY}");
+                await ChatHubManager.SendCoordsAsync($"{clientX} : {clientY}");
             }
         }
 

@@ -7,6 +7,7 @@ namespace DndBoard.Client.Helpers
 {
     public class ChatHubManager
     {
+        private string _boardId;
         private HubConnection _hubConnection;
         private readonly NavigationManager _navigationManager;
 
@@ -24,11 +25,17 @@ namespace DndBoard.Client.Helpers
         public async Task CloseConnectionAsync() =>
             await _hubConnection.DisposeAsync();
 
-        public void SetMessageHandler(Action<string, string> handler) =>
+        public void SetMessageHandler(Action<string> handler) =>
             _hubConnection.On("ReceiveMessage", handler);
 
-        public async Task SendAsync(string user, string message) =>
-            await _hubConnection.SendAsync("SendMessage", user, message);
+        public async Task SendCoordsAsync(string message) =>
+            await _hubConnection.SendAsync("SendCoords", _boardId, message);
+
+        public async Task ConnectAsync(string boardId)
+        {
+            _boardId = boardId;
+            await _hubConnection.SendAsync("Connect", _boardId);
+        }
 
 
         private HubConnection SetupSignalRConnection(string hubUri)
