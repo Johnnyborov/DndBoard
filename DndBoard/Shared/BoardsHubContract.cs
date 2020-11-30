@@ -6,5 +6,6 @@
 
         public const string CoordsChanged = nameof(CoordsChanged);
         public const string Connect = nameof(Connect);
+        public const string Connected = nameof(Connected);
     }
 }

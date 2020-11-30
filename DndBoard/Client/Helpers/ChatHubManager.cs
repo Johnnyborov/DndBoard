@@ -26,6 +26,9 @@ namespace DndBoard.Client.Helpers
         public async Task CloseConnectionAsync() =>
             await _hubConnection.DisposeAsync();
 
+        public void SetConnectedHandler(Action<string> handler) =>
+            _hubConnection.On(BoardsHubContract.Connected, handler);
+
         public void SetCoordsReceivedHandler(Action<string> handler) =>
             _hubConnection.On(BoardsHubContract.CoordsChanged, handler);
 

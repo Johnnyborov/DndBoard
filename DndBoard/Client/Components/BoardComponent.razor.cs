@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DndBoard.Client.Helpers;
+using DndBoard.Client.Store;
 using Microsoft.AspNetCore.Components;
 
 namespace DndBoard.Client.Components
@@ -12,8 +13,12 @@ namespace DndBoard.Client.Components
         private string _boardId;
 #pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore CS0649 // Uninitialized value
+        private string _connectedBoardId;
+        private ImagesComponent _imagesComponent;
         [Inject]
         private ChatHubManager _chatHubManager { get; set; }
+        [Inject]
+        private AppState _appState { get; set; }
 
 
         public void Dispose()
@@ -26,12 +31,25 @@ namespace DndBoard.Client.Components
         protected override async Task OnInitializedAsync()
         {
             _chatHubManager.SetupConnectionAsync();
+            _chatHubManager.SetConnectedHandler(ConnectedHanlder);
             await _chatHubManager.StartConnectionAsync();
         }
 
         private async Task ConnectAsync()
         {
             await _chatHubManager.ConnectAsync(_boardId);
+        }
+
+        private void ConnectedHanlder(string boardId)
+        {
+            if (_connectedBoardId == boardId)
+                return;
+
+            _connectedBoardId = boardId;
+            StateHasChanged();
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            _appState.InvokeBoardIdChanged(boardId);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
     }
 }
