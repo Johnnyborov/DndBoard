@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using DndBoard.Server.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using DndBoard.Shared;
 
 namespace DndBoard.Server.Controllers
 {
@@ -15,11 +17,16 @@ namespace DndBoard.Server.Controllers
     {
         private readonly ILogger<ImagesController> _logger;
         private readonly BoardsManager _boardManager;
+        private readonly IHubContext<BoardsHub> _boardsHubContext;
 
-        public ImagesController(ILogger<ImagesController> logger, BoardsManager boardManager)
+        public ImagesController(
+            ILogger<ImagesController> logger,
+            BoardsManager boardManager,
+            IHubContext<BoardsHub> boardsHubContext)
         {
             _logger = logger;
             _boardManager = boardManager;
+            _boardsHubContext = boardsHubContext;
         }
 
 
@@ -42,6 +49,7 @@ namespace DndBoard.Server.Controllers
                 Board board = _boardManager.GetBoard(boardId);
                 board.AddFile(ms.ToArray());
             }
+            await _boardsHubContext.Clients.All.SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
 
             return Ok("do something with this data....");
         }

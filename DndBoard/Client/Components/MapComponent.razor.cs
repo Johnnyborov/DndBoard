@@ -17,29 +17,26 @@ namespace DndBoard.Client.Components
         private bool _pressed;
 #pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore CS0649 // Uninitialized value
+        List<Coords> _coords;
         [Inject]
         private CanvasMapRenderer _canvasMapRenderer { get; set; }
         [Inject]
         private AppState _appState { get; set; }
-        [Parameter]
-        public ChatHubManager ChatHubManager { get; set; }
 
         protected override void OnInitialized()
         {
-            ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
+            _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
             _appState.FilesRefsChanged += Redraw;
-        }
-
-        List<Coords> _coords;
-        private async Task Redraw()
-        {
-            await _canvasMapRenderer.RedrawImagesByCoords(_coords,
-                Canvas, _appState.FilesRefs);
         }
 
         private async void CoordsReceivedHandler(string coordsJson)
         {
             _coords = JsonSerializer.Deserialize<List<Coords>>(coordsJson);
+            await Redraw();
+        }
+
+        private async Task Redraw()
+        {
             await _canvasMapRenderer.RedrawImagesByCoords(_coords,
                 Canvas, _appState.FilesRefs);
         }
@@ -51,7 +48,7 @@ namespace DndBoard.Client.Components
                 Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
                 _coords[0] = coords;
                 string coordsJson = JsonSerializer.Serialize(_coords);
-                await ChatHubManager.SendCoordsAsync(coordsJson);
+                await _appState.ChatHubManager.SendCoordsAsync(coordsJson);
             }
         }
 

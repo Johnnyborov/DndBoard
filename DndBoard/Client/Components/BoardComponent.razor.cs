@@ -14,7 +14,6 @@ namespace DndBoard.Client.Components
 #pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore CS0649 // Uninitialized value
         private string _connectedBoardId;
-        private ImagesComponent _imagesComponent;
         [Inject]
         private ChatHubManager _chatHubManager { get; set; }
         [Inject]
@@ -30,6 +29,7 @@ namespace DndBoard.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
+            _appState.ChatHubManager = _chatHubManager;
             _chatHubManager.SetupConnectionAsync();
             _chatHubManager.SetConnectedHandler(ConnectedHanlder);
             await _chatHubManager.StartConnectionAsync();

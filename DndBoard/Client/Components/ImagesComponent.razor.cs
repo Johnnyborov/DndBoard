@@ -32,6 +32,22 @@ namespace DndBoard.Client.Components
         protected override void OnInitialized()
         {
             _appState.BoardIdChanged += OnBoardIdChanged;
+            _appState.ChatHubManager.SetNofifyFilesUpdateHandler(OnFilesUpdated);
+        }
+
+        public void OnFilesUpdated(string boardId)
+        {
+            if (_boardId != boardId)
+                return;
+
+            _ = RefreshFilesAsync();
+            async Task RefreshFilesAsync()
+            {
+                await ReloadFilesIds();
+                _appState.FilesRefs = _filesRefs.Values.ToArray();
+                await Task.Delay(300); // WTF? Images not really loaded by this time?
+                await _appState.InvokeFilesRefsChanged();
+            }
         }
 
         public async Task OnBoardIdChanged(string boardId)

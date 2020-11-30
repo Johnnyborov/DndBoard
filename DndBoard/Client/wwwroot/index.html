@@ -22,7 +22,6 @@
         var boardIdGlobal;
         var componentInstanceGlobal;
         function onInputChange(e) {
-            console.log(boardIdGlobal);
             const fd = new FormData();
             // add all selected files
             Array.prototype.forEach.call(e.target.files, (file) => {
@@ -42,8 +41,6 @@
             xhr.send(fd);
         }
         function reinitializeFileInput(boardId, input, componentInstance) {
-            console.log(boardIdGlobal);
-            console.log(boardId);
             boardIdGlobal = boardId;
             componentInstanceGlobal = componentInstance;
             input.removeEventListener('change', onInputChange);
