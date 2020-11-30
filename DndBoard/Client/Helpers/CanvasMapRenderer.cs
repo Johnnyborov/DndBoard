@@ -13,7 +13,7 @@ namespace DndBoard.Client.Helpers
         public async Task RedrawImagesByCoords(
             double x, double y,
             BECanvasComponent canvas,
-            ElementReference image)
+            ElementReference[] images)
         {
             await _semaphore.WaitAsync();
             try
@@ -22,7 +22,10 @@ namespace DndBoard.Client.Helpers
                 await context.ClearRectAsync(0, 0, canvas.Width, canvas.Height);
                 await context.SetFillStyleAsync("Red");
                 await context.FillRectAsync(0, 0, canvas.Width, canvas.Height);
-                await context.DrawImageAsync(image, x, y);
+                foreach (var img in images)
+                {
+                    await context.DrawImageAsync(img, x, y);
+                }
             }
             finally
             {

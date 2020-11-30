@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using DndBoard.Client.BaseComponents;
 using DndBoard.Client.Helpers;
+using DndBoard.Client.Store;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -10,26 +11,36 @@ namespace DndBoard.Client.Components
     {
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable CS0649 // Uninitialized value
-        private ElementReference _testImage;
         private bool _pressed;
 #pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore CS0649 // Uninitialized value
         [Inject]
         private CanvasMapRenderer _canvasMapRenderer { get; set; }
+        [Inject]
+        private AppState _appState { get; set; }
         [Parameter]
         public ChatHubManager ChatHubManager { get; set; }
 
         protected override void OnInitialized()
         {
             ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
+            _appState.FilesRefsChanged += Redraw;
+        }
+
+        private double _clientX, _clientY;
+        private async Task Redraw()
+        {
+            await _canvasMapRenderer.RedrawImagesByCoords(_clientX, _clientY,
+                Canvas, _appState.FilesRefs);
         }
 
         private async void CoordsReceivedHandler(string message)
         {
             string[] coords = message.Split(":");
-            double clientX = double.Parse(coords[0].Trim());
-            double clientY = double.Parse(coords[1].Trim());
-            await _canvasMapRenderer.RedrawImagesByCoords(clientX, clientY, Canvas, _testImage);
+            _clientX = double.Parse(coords[0].Trim());
+            _clientY = double.Parse(coords[1].Trim());
+            await _canvasMapRenderer.RedrawImagesByCoords(_clientX, _clientY,
+                Canvas, _appState.FilesRefs);
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)

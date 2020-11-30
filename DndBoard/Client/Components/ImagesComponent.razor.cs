@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -13,11 +14,12 @@ namespace DndBoard.Client.Components
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable CS0649 // Uninitialized value
         private ElementReference _files;
+        private Dictionary<string, ElementReference> _filesRefs
+            = new Dictionary<string, ElementReference>();
 #pragma warning restore IDE0044 // Add readonly modifier
 #pragma warning restore CS0649 // Uninitialized value
         private IEnumerable<string> _filesIds;
         private string _boardId;
-        private bool _show;
 
         [Inject]
         private IJSRuntime _jsRuntime { get; set; }
@@ -37,6 +39,8 @@ namespace DndBoard.Client.Components
             _boardId = boardId;
             await ReinitializeFileInput();
             await ReloadFilesIds();
+            _appState.FilesRefs = _filesRefs.Values.ToArray();
+            await _appState.InvokeFilesRefsChanged();
         }
 
         [JSInvokable]

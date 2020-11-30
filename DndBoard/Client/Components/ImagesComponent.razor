@@ -10,5 +10,5 @@
 @if (_filesIds != null)
 @foreach (string fileId in _filesIds)
 {
-    <img src="/images/getfile/@_boardId/@fileId" />
+    <img @ref="_filesRefs[fileId]" src="/images/getfile/@_boardId/@fileId" />
 }
