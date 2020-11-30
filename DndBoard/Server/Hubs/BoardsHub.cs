@@ -22,7 +22,7 @@ namespace DndBoard.Server.Hubs
             Board board = _boardsManager.GetBoard(boardId);
             List<Coords> coords = JsonSerializer.Deserialize<List<Coords>>(coordsJson);
             board.CoordsList = coords;
-            await Clients.All.SendAsync(BoardsHubContract.CoordsChanged, coordsJson);
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.CoordsChanged, coordsJson);
         }
 
         [HubMethodName(BoardsHubContract.Connect)]
@@ -35,6 +35,8 @@ namespace DndBoard.Server.Hubs
                         CoordsList = new List<Coords> { new Coords { X = 33, Y = 111 } }
                     }
                 );
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, boardId);
 
             Board board = _boardsManager.GetBoard(boardId);
             await Clients.Caller.SendAsync(BoardsHubContract.Connected, boardId);

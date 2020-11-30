@@ -49,7 +49,7 @@ namespace DndBoard.Server.Controllers
                 Board board = _boardManager.GetBoard(boardId);
                 board.AddFile(ms.ToArray());
             }
-            await _boardsHubContext.Clients.All.SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
+            await _boardsHubContext.Clients.Group(boardId).SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
 
             return Ok("do something with this data....");
         }

@@ -37,15 +37,11 @@ namespace DndBoard.Client.Components
 
         public void OnFilesUpdated(string boardId)
         {
-            if (_boardId != boardId)
-                return;
-
             _ = RefreshFilesAsync();
             async Task RefreshFilesAsync()
             {
                 await ReloadFilesIds();
                 _appState.FilesRefs = _filesRefs.Values.ToArray();
-                await Task.Delay(300); // WTF? Images not really loaded by this time?
                 await _appState.InvokeFilesRefsChanged();
             }
         }
@@ -66,6 +62,7 @@ namespace DndBoard.Client.Components
                 $"images/getfilesids/{_boardId}"
             );
             StateHasChanged();
+            await Task.Delay(300); // WTF? Images not really loaded by this time?
         }
 
         private async Task ReinitializeFileInput()
