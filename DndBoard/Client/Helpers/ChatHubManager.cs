@@ -32,8 +32,8 @@ namespace DndBoard.Client.Helpers
         public void SetCoordsReceivedHandler(Action<string> handler) =>
             _hubConnection.On(BoardsHubContract.CoordsChanged, handler);
 
-        public async Task SendCoordsAsync(string coords) =>
-            await _hubConnection.SendAsync(BoardsHubContract.CoordsChanged, _boardId, coords);
+        public async Task SendCoordsAsync(string coordsJson) =>
+            await _hubConnection.SendAsync(BoardsHubContract.CoordsChanged, _boardId, coordsJson);
 
         public async Task ConnectAsync(string boardId)
         {

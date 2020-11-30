@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading.Tasks;
 using DndBoard.Client.BaseComponents;
 using DndBoard.Client.Helpers;
 using DndBoard.Client.Store;
+using DndBoard.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -27,19 +30,17 @@ namespace DndBoard.Client.Components
             _appState.FilesRefsChanged += Redraw;
         }
 
-        private double _clientX, _clientY;
+        List<Coords> _coords;
         private async Task Redraw()
         {
-            await _canvasMapRenderer.RedrawImagesByCoords(_clientX, _clientY,
+            await _canvasMapRenderer.RedrawImagesByCoords(_coords,
                 Canvas, _appState.FilesRefs);
         }
 
-        private async void CoordsReceivedHandler(string message)
+        private async void CoordsReceivedHandler(string coordsJson)
         {
-            string[] coords = message.Split(":");
-            _clientX = double.Parse(coords[0].Trim());
-            _clientY = double.Parse(coords[1].Trim());
-            await _canvasMapRenderer.RedrawImagesByCoords(_clientX, _clientY,
+            _coords = JsonSerializer.Deserialize<List<Coords>>(coordsJson);
+            await _canvasMapRenderer.RedrawImagesByCoords(_coords,
                 Canvas, _appState.FilesRefs);
         }
 
@@ -47,8 +48,10 @@ namespace DndBoard.Client.Components
         {
             if (_pressed)
             {
-                (double clientX, double clientY) = await GetCanvasCoordinatesAsync(mouseEventArgs);
-                await ChatHubManager.SendCoordsAsync($"{clientX} : {clientY}");
+                Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
+                _coords[0] = coords;
+                string coordsJson = JsonSerializer.Serialize(_coords);
+                await ChatHubManager.SendCoordsAsync(coordsJson);
             }
         }
 

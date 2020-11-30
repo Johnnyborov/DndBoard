@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using DndBoard.Shared;
 
 namespace DndBoard.Server.Hubs
 {
@@ -10,8 +11,7 @@ namespace DndBoard.Server.Hubs
             new ConcurrentDictionary<string, byte[]>();
 
         public string BoardId { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
+        public List<Coords> CoordsList { get; set; }
 
 
         public byte[] GetFile(string fileId)

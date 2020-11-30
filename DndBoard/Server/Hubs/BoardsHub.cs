@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading.Tasks;
 using DndBoard.Shared;
 using Microsoft.AspNetCore.SignalR;
 
@@ -15,25 +17,31 @@ namespace DndBoard.Server.Hubs
 
 
         [HubMethodName(BoardsHubContract.CoordsChanged)]
-        public async Task SendCoords(string boardId, string coords)
+        public async Task SendCoords(string boardId, string coordsJson)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            string[] coordsArr = coords.Split(":");
-            board.X = int.Parse(coordsArr[0].Trim());
-            board.Y = int.Parse(coordsArr[1].Trim());
-
-            await Clients.All.SendAsync(BoardsHubContract.CoordsChanged, coords);
+            List<Coords> coords = JsonSerializer.Deserialize<List<Coords>>(coordsJson);
+            board.CoordsList = coords;
+            await Clients.All.SendAsync(BoardsHubContract.CoordsChanged, coordsJson);
         }
 
         [HubMethodName(BoardsHubContract.Connect)]
         public async Task Connect(string boardId)
         {
             if (!_boardsManager.BoardExists(boardId))
-                _boardsManager.AddBoard(new Board { BoardId = boardId, X = 33, Y = 111 });
+                _boardsManager.AddBoard(new Board
+                    {
+                        BoardId = boardId,
+                        CoordsList = new List<Coords> { new Coords { X = 33, Y = 111 } }
+                    }
+                );
 
             Board board = _boardsManager.GetBoard(boardId);
             await Clients.Caller.SendAsync(BoardsHubContract.Connected, boardId);
-            await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, $"{board.X} : {board.Y}");
+
+            List<Coords> coords = board.CoordsList;
+            string coordsJson = JsonSerializer.Serialize(coords);
+            await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsJson);
         }
     }
 }
