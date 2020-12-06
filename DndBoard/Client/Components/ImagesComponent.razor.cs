@@ -32,8 +32,6 @@ namespace DndBoard.Client.Components
         private HttpClient _httpClient { get; set; }
         [Inject]
         private AppState _appState { get; set; }
-        [Inject]
-        private CanvasMapRenderer _canvasMapRenderer { get; set; }
 
 
         protected override void OnInitialized()

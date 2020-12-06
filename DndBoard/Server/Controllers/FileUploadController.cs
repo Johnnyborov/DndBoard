@@ -23,13 +23,14 @@ namespace DndBoard.Server.Controllers
 
 
         [HttpPost]
-        public async Task PostFiles(UploadedFile uploadedFile)
+        public async Task PostFiles(UploadedFiles uploadedFiles)
         {
-            string boardId = uploadedFile.BoardId;
-            {
-                Board board = _boardManager.GetBoard(boardId);
-                board.AddFile(uploadedFile.FileContent);
-            }
+            string boardId = uploadedFiles.BoardId;
+            Board board = _boardManager.GetBoard(boardId);
+
+            foreach (UploadedFile file in uploadedFiles.Files)
+                board.AddFile(file.FileContent);
+
             await _boardsHubContext.Clients.Group(boardId)
                 .SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
         }

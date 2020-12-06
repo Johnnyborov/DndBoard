@@ -12,14 +12,8 @@ namespace DndBoard.Client.Components
 {
     public partial class MapComponent : CanvasBaseComponent
     {
-#pragma warning disable IDE0044 // Add readonly modifier
-#pragma warning disable CS0649 // Uninitialized value
         private bool _pressed;
-#pragma warning restore IDE0044 // Add readonly modifier
-#pragma warning restore CS0649 // Uninitialized value
         List<Coords> _coords;
-        [Inject]
-        private CanvasMapRenderer _canvasMapRenderer { get; set; }
         [Inject]
         private AppState _appState { get; set; }
 

@@ -24,39 +24,50 @@ namespace DndBoard.Client.Components
         private HttpClient _httpClient { get; set; }
         [Inject]
         private AppState _appState { get; set; }
-        [Inject]
-        private CanvasMapRenderer _canvasMapRenderer { get; set; }
 
 
         private async Task OnInputFileChange(InputFileChangeEventArgs e)
         {
             int maxAllowedFiles = 777;
-            string format = "image/png";
 
+            List<UploadedFile> files = new();
             foreach (IBrowserFile imageFile in e.GetMultipleFiles(maxAllowedFiles))
             {
-                IBrowserFile resizedImageFile = await imageFile
-                    .RequestImageFileAsync(format, 100, 100);
-
-                await SendFilesToServer(resizedImageFile);
+                UploadedFile uploadedFile = await ConvertToUploadedFile(imageFile);
+                files.Add(uploadedFile);
             }
+
+            await SendFilesToServer(files);
         }
 
-        private async Task SendFilesToServer(IBrowserFile file)
+        private static async Task<UploadedFile> ConvertToUploadedFile(IBrowserFile imageFile)
         {
-            Stream stream = file.OpenReadStream();
+            string format = "image/png";
+
+            IBrowserFile resizedImageFile = await imageFile
+                                .RequestImageFileAsync(format, 100, 100);
+
+            Stream stream = resizedImageFile.OpenReadStream();
             MemoryStream ms = new MemoryStream();
             await stream.CopyToAsync(ms);
             stream.Close();
 
             UploadedFile uploadedFile = new();
-            uploadedFile.BoardId = _boardId;
-            uploadedFile.FileName = file.Name;
+            uploadedFile.FileName = resizedImageFile.Name;
             uploadedFile.FileContent = ms.ToArray();
             ms.Close();
 
+            return uploadedFile;
+        }
+
+        private async Task SendFilesToServer(List<UploadedFile> files)
+        {
+            UploadedFiles uploadedFiles = new();
+            uploadedFiles.BoardId = _boardId;
+            uploadedFiles.Files = files.ToArray();
+
             await _httpClient.PostAsJsonAsync(
-                "/fileupload/PostFiles", uploadedFile
+                "/fileupload/PostFiles", uploadedFiles
             );
         }
 
@@ -67,7 +78,7 @@ namespace DndBoard.Client.Components
             _appState.FilesRefsChanged += Redraw;
         }
 
-        public void OnFilesUpdated(string boardId)
+        private void OnFilesUpdated(string boardId)
         {
             _ = RefreshFilesAsync();
             async Task RefreshFilesAsync()
@@ -88,13 +99,13 @@ namespace DndBoard.Client.Components
                 Canvas, _appState.FilesRefs);
         }
 
-        public async Task OnBoardIdChanged(string boardId)
+        private async Task OnBoardIdChanged(string boardId)
         {
             _boardId = boardId;
             OnFilesUpdated(_boardId);
         }
 
-        public async Task ReloadFiles()
+        private async Task ReloadFiles()
         {
             List<string> fileIds = await _httpClient.GetFromJsonAsync<List<string>>(
                 $"images/getfilesids/{_boardId}"
@@ -103,6 +114,23 @@ namespace DndBoard.Client.Components
             StateHasChanged();
             _images = fileIds.Select(id => new Image { FileId = id }).ToList();
             StateHasChanged();
+            await Task.Delay(300); // Wait for images to get downloaded. Use loaded event?
         }
     }
 }
+
+
+//var img = document.querySelector('img')
+
+//function loaded() {
+//  alert('loaded');
+//}
+
+//if (img.complete) {
+//  loaded();
+//} else {
+//  img.addEventListener('load', loaded);
+//  img.addEventListener('error', function() {
+//      alert('error')
+//  });
+//}
