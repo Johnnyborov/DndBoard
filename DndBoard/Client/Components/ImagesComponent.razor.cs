@@ -17,6 +17,7 @@ namespace DndBoard.Client.Components
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable CS0649 // Uninitialized value
         private ElementReference _files;
+        // Dictionary for refs is/was shit, old values dont get cleaned
         private Dictionary<string, ElementReference> _filesRefs
             = new Dictionary<string, ElementReference>();
 #pragma warning restore IDE0044 // Add readonly modifier
@@ -59,7 +60,7 @@ namespace DndBoard.Client.Components
             for (int i = 0; i < _appState.FilesRefs.Length; i++)
                 _coords.Add(new Coords { X = 50, Y = 50 + i * 100 });
 
-            await _canvasMapRenderer.RedrawImagesByCoords(_coords,
+            await CanvasMapRenderer.RedrawImagesByCoords(_coords,
                 Canvas, _appState.FilesRefs);
         }
 

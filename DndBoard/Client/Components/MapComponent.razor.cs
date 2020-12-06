@@ -38,7 +38,7 @@ namespace DndBoard.Client.Components
 
         private async Task Redraw()
         {
-            await _canvasMapRenderer.RedrawImagesByCoords(_coords,
+            await CanvasMapRenderer.RedrawImagesByCoords(_coords,
                 Canvas, _appState.FilesRefs);
         }
 

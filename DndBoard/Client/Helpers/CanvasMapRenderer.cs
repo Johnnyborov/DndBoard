@@ -12,7 +12,7 @@ namespace DndBoard.Client.Helpers
     public class CanvasMapRenderer
     {
         private static SemaphoreSlim _semaphore = new SemaphoreSlim(1);
-        public async Task RedrawImagesByCoords(
+        public static async Task RedrawImagesByCoords(
             List<Coords> coords,
             BECanvasComponent canvas,
             ElementReference[] images)
@@ -35,13 +35,17 @@ namespace DndBoard.Client.Helpers
                     i++;
                 }
             }
+            catch(Exception ex)
+            {
+                var x = ex;
+            }
             finally
             {
                 _semaphore.Release();
             }
         }
 
-        public async Task RedrawTestImageAsync(BECanvasComponent canvas, ElementReference image)
+        public static async Task RedrawTestImageAsync(BECanvasComponent canvas, ElementReference image)
         {
             Canvas2DContext context = await canvas.CreateCanvas2DAsync();
 
