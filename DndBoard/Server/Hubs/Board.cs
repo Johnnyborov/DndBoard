@@ -11,7 +11,7 @@ namespace DndBoard.Server.Hubs
             new ConcurrentDictionary<string, byte[]>();
 
         public string BoardId { get; set; }
-        public List<Coords> CoordsList { get; set; }
+        public List<MyImage> ImagesOnMap { get; set; }
 
 
         public byte[] GetFile(string fileId)

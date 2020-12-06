@@ -17,12 +17,24 @@ namespace DndBoard.Server.Hubs
 
 
         [HubMethodName(BoardsHubContract.CoordsChanged)]
-        public async Task SendCoords(string boardId, string coordsJson)
+        public async Task SendCoords(string boardId, string coordsChangeDataJson)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            List<Coords> coords = JsonSerializer.Deserialize<List<Coords>>(coordsJson);
-            board.CoordsList = coords;
-            await Clients.Group(boardId).SendAsync(BoardsHubContract.CoordsChanged, coordsJson);
+            CoordsChangeData coordsChangeData = JsonSerializer
+                .Deserialize<CoordsChangeData>(coordsChangeDataJson);
+
+            if (!board.ImagesOnMap.Exists(img => img.Id == coordsChangeData.ImageId))
+                board.ImagesOnMap.Add(new MyImage
+                {
+                    Id = coordsChangeData.ImageId,
+                    Coords = coordsChangeData.Coords,
+                    ModelId = coordsChangeData.ModelId,
+                });
+            else
+                board.ImagesOnMap.Find(img => img.Id == coordsChangeData.ImageId)
+                    .Coords = coordsChangeData.Coords;
+
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
         }
 
         [HubMethodName(BoardsHubContract.Connect)]
@@ -30,20 +42,27 @@ namespace DndBoard.Server.Hubs
         {
             if (!_boardsManager.BoardExists(boardId))
                 _boardsManager.AddBoard(new Board
-                    {
-                        BoardId = boardId,
-                        CoordsList = new List<Coords> { new Coords { X = 33, Y = 111 } }
-                    }
-                );
+                {
+                    BoardId = boardId,
+                    ImagesOnMap = new List<MyImage>()
+                });
 
             await Groups.AddToGroupAsync(Context.ConnectionId, boardId);
 
             Board board = _boardsManager.GetBoard(boardId);
             await Clients.Caller.SendAsync(BoardsHubContract.Connected, boardId);
 
-            List<Coords> coords = board.CoordsList;
-            string coordsJson = JsonSerializer.Serialize(coords);
-            await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsJson);
+            foreach (MyImage img in board.ImagesOnMap)
+            {
+                CoordsChangeData coordsChangeData = new CoordsChangeData
+                {
+                    ImageId = img.Id,
+                    Coords = img.Coords,
+                    ModelId = img.ModelId,
+                };
+                string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
+                await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
+            }
         }
     }
 }

@@ -7,14 +7,15 @@
     <InputFile OnChange="@OnInputFileChange" multiple />
 </p>
 
-@foreach (var image in _images)
+@foreach (var image in _appState.ModelImages)
 {
-    <img @ref="image.Ref" src="/images/getfile/@_boardId/@image.FileId" hidden/>
+    <img @ref="image.Ref" src="/images/getfile/@_boardId/@image.Id" hidden/>
 }
 
 <div style="width: 700px; height: 700px; overflow-y: scroll;">
     <div
         @ref="DivCanvas"
+         @onclick="OnClick"
         style="background-color: yellow"
     >
         <BECanvas @ref="Canvas" Height="600" Width="600"></BECanvas>

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoard.Client.BaseComponents;
 using DndBoard.Client.Helpers;
@@ -11,14 +13,13 @@ using DndBoard.Client.Store;
 using DndBoard.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace DndBoard.Client.Components
 {
     public partial class ImagesComponent2 : CanvasBaseComponent
     {
-        private List<Image> _images = new();
         private string _boardId;
-        private readonly List<Coords> _coords = new();
 
         [Inject]
         private HttpClient _httpClient { get; set; }
@@ -71,11 +72,31 @@ namespace DndBoard.Client.Components
             );
         }
 
+        private async Task OnClick(MouseEventArgs mouseEventArgs)
+        {
+            Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
+            MapImage clickedImage = GetClickedImage(coords);
+ 
+            CoordsChangeData coordsChangeData = new CoordsChangeData
+            {
+                ImageId = Guid.NewGuid().ToString(),
+                Coords = new Coords { X = 10, Y = 10 },
+                ModelId = clickedImage.Id,
+            };
+            string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
+            await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
+            await _appState.InvokeFilesRefsChanged();
+        }
+
+        private MapImage GetClickedImage(Coords coords)
+        {
+            return _appState.ModelImages[0];
+        }
+
         protected override void OnInitialized()
         {
             _appState.BoardIdChanged += OnBoardIdChanged;
             _appState.ChatHubManager.SetNofifyFilesUpdateHandler(OnFilesUpdated);
-            _appState.FilesRefsChanged += Redraw;
         }
 
         private void OnFilesUpdated(string boardId)
@@ -84,19 +105,13 @@ namespace DndBoard.Client.Components
             async Task RefreshFilesAsync()
             {
                 await ReloadFiles();
-                _appState.FilesRefs = _images.Select(i => i.Ref).ToArray();
-                await _appState.InvokeFilesRefsChanged();
+                await Redraw();
             }
         }
 
         private async Task Redraw()
         {
-            _coords.Clear();
-            for (int i = 0; i < _appState.FilesRefs.Length; i++)
-                _coords.Add(new Coords { X = 50, Y = 50 + i * 100 });
-
-            await CanvasMapRenderer.RedrawImagesByCoords(_coords,
-                Canvas, _appState.FilesRefs);
+            await CanvasMapRenderer.RedrawImagesByCoords(Canvas, _appState.ModelImages);
         }
 
         private async Task OnBoardIdChanged(string boardId)
@@ -110,9 +125,14 @@ namespace DndBoard.Client.Components
             List<string> fileIds = await _httpClient.GetFromJsonAsync<List<string>>(
                 $"images/getfilesids/{_boardId}"
             );
-            _images = new(); // Otherwise existing refs don't get updated.
+
+            _appState.ModelImages = new(); // Otherwise existing refs don't get updated.
             StateHasChanged();
-            _images = fileIds.Select(id => new Image { FileId = id }).ToList();
+
+            _appState.ModelImages = fileIds.Select(id => new MapImage { Id = id }).ToList();
+            for (int i = 0; i < _appState.ModelImages.Count; i++)
+                _appState.ModelImages[i].Coords = new Coords { X = 50, Y = 50 + i * 100 };
+
             StateHasChanged();
             await Task.Delay(300); // Wait for images to get downloaded. Use loaded event?
         }

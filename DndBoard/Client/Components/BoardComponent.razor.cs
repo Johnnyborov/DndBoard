@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DndBoard.Client.Helpers;
+using DndBoard.Client.Models;
 using DndBoard.Client.Store;
 using Microsoft.AspNetCore.Components;
 
@@ -38,10 +40,8 @@ namespace DndBoard.Client.Components
 
         private void ConnectedHanlder(string boardId)
         {
-            if (_connectedBoardId == boardId)
-                return;
-
-            _appState.FilesRefs = new ElementReference[0];
+            _appState.MapImages = new List<MapImage>();
+            _appState.ModelImages = new List<MapImage>();
             _connectedBoardId = boardId;
             StateHasChanged();
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
