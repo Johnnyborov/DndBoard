@@ -33,7 +33,7 @@ namespace DndBoard.Client.Helpers
             _hubConnection.On(BoardsHubContract.CoordsChanged, handler);
 
         public void SetNofifyFilesUpdateHandler(Action<string> handler) =>
-           _hubConnection.On(BoardsHubContract.NotifyFilesUpdate, handler);
+            _hubConnection.On(BoardsHubContract.NotifyFilesUpdate, handler);
 
         public async Task SendCoordsAsync(string coordsJson) =>
             await _hubConnection.SendAsync(BoardsHubContract.CoordsChanged, _boardId, coordsJson);

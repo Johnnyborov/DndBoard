@@ -28,6 +28,9 @@ namespace DndBoard.Client.Helpers
                 int i = 0;
                 foreach (var img in images)
                 {
+                    if (i >= coords.Count)
+                        return;
+
                     await context.DrawImageAsync(img, coords[i].X, coords[i].Y);
                     i++;
                 }
