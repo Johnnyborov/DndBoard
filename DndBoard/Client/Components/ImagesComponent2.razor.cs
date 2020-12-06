@@ -106,6 +106,7 @@ namespace DndBoard.Client.Components
             {
                 await ReloadFiles();
                 await Redraw();
+                await _appState.ChatHubManager.RequestAllCoords();
             }
         }
 

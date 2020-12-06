@@ -16,6 +16,24 @@ namespace DndBoard.Server.Hubs
         }
 
 
+        [HubMethodName(BoardsHubContract.RequestAllCoords)]
+        public async Task RequestAllCoords(string boardId)
+        {
+            Board board = _boardsManager.GetBoard(boardId);
+            foreach (MyImage img in board.ImagesOnMap)
+            {
+                CoordsChangeData coordsChangeData = new CoordsChangeData
+                {
+                    ImageId = img.Id,
+                    Coords = img.Coords,
+                    ModelId = img.ModelId,
+                };
+
+                string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
+                await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
+            }
+        }
+
         [HubMethodName(BoardsHubContract.CoordsChanged)]
         public async Task SendCoords(string boardId, string coordsChangeDataJson)
         {
@@ -48,21 +66,7 @@ namespace DndBoard.Server.Hubs
                 });
 
             await Groups.AddToGroupAsync(Context.ConnectionId, boardId);
-
-            Board board = _boardsManager.GetBoard(boardId);
             await Clients.Caller.SendAsync(BoardsHubContract.Connected, boardId);
-
-            foreach (MyImage img in board.ImagesOnMap)
-            {
-                CoordsChangeData coordsChangeData = new CoordsChangeData
-                {
-                    ImageId = img.Id,
-                    Coords = img.Coords,
-                    ModelId = img.ModelId,
-                };
-                string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
-                await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
-            }
         }
     }
 }

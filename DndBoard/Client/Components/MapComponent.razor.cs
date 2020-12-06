@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoard.Client.BaseComponents;
 using DndBoard.Client.Helpers;
@@ -20,13 +21,21 @@ namespace DndBoard.Client.Components
         protected override void OnInitialized()
         {
             _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
-            _appState.FilesRefsChanged += Redraw;
+            _appState.FilesRefsChanged += OnFileRefsChanged;
+            _appState.BoardIdChanged += boardId => Redraw();
+        }
+
+        private async Task OnFileRefsChanged()
+        {
+
+            await Redraw();
         }
 
         private async void CoordsReceivedHandler(string coordsChangeDataJson)
         {
             CoordsChangeData coordsChangeData = JsonSerializer
                 .Deserialize<CoordsChangeData>(coordsChangeDataJson);
+
             if (!_appState.MapImages.Exists(img => img.Id == coordsChangeData.ImageId)
                 && _appState.ModelImages.Exists(x => x.Id == coordsChangeData.ModelId))
             {
@@ -43,8 +52,9 @@ namespace DndBoard.Client.Components
             {
                 _appState.MapImages.Find(img => img.Id == coordsChangeData.ImageId)
                     .Coords = coordsChangeData.Coords;
-                await Redraw();
             }
+
+            await Redraw();
         }
 
         private async Task Redraw()
