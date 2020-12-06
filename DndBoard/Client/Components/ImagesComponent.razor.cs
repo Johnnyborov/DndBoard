@@ -3,13 +3,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using DndBoard.Client.BaseComponents;
+using DndBoard.Client.Helpers;
 using DndBoard.Client.Store;
+using DndBoard.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace DndBoard.Client.Components
 {
-    public partial class ImagesComponent : ComponentBase
+    public partial class ImagesComponent : CanvasBaseComponent
     {
 #pragma warning disable IDE0044 // Add readonly modifier
 #pragma warning disable CS0649 // Uninitialized value
@@ -20,6 +23,7 @@ namespace DndBoard.Client.Components
 #pragma warning restore CS0649 // Uninitialized value
         private IEnumerable<string> _filesIds;
         private string _boardId;
+        private readonly List<Coords> _coords = new List<Coords>();
 
         [Inject]
         private IJSRuntime _jsRuntime { get; set; }
@@ -27,12 +31,15 @@ namespace DndBoard.Client.Components
         private HttpClient _httpClient { get; set; }
         [Inject]
         private AppState _appState { get; set; }
+        [Inject]
+        private CanvasMapRenderer _canvasMapRenderer { get; set; }
 
 
         protected override void OnInitialized()
         {
             _appState.BoardIdChanged += OnBoardIdChanged;
             _appState.ChatHubManager.SetNofifyFilesUpdateHandler(OnFilesUpdated);
+            _appState.FilesRefsChanged += Redraw;
         }
 
         public void OnFilesUpdated(string boardId)
@@ -46,13 +53,21 @@ namespace DndBoard.Client.Components
             }
         }
 
+        private async Task Redraw()
+        {
+            _coords.Clear();
+            for (int i = 0; i < _appState.FilesRefs.Length; i++)
+                _coords.Add(new Coords { X = 50, Y = 50 + i * 100 });
+
+            await _canvasMapRenderer.RedrawImagesByCoords(_coords,
+                Canvas, _appState.FilesRefs);
+        }
+
         public async Task OnBoardIdChanged(string boardId)
         {
             _boardId = boardId;
             await ReinitializeFileInput();
-            await ReloadFilesIds();
-            _appState.FilesRefs = _filesRefs.Values.ToArray();
-            await _appState.InvokeFilesRefsChanged();
+            OnFilesUpdated(_boardId);
         }
 
         [JSInvokable]

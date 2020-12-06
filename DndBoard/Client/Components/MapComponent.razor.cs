@@ -23,6 +23,7 @@ namespace DndBoard.Client.Components
         [Inject]
         private AppState _appState { get; set; }
 
+
         protected override void OnInitialized()
         {
             _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
