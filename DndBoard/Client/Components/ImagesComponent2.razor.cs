@@ -138,12 +138,13 @@ namespace DndBoard.Client.Components
                 $"images/getfilesids/{_boardId}"
             );
 
+            _appState.MapImages = new(); // Old image refs become invalid, so recreate.
             _appState.ModelImages = new(); // Otherwise existing refs don't get updated.
             StateHasChanged();
 
             _appState.ModelImages = fileIds.Select(id => new MapImage { Id = id }).ToList();
             for (int i = 0; i < _appState.ModelImages.Count; i++)
-                _appState.ModelImages[i].Coords = new Coords { X = 50, Y = 50 + i * 100 };
+                _appState.ModelImages[i].Coords = new Coords { X = 50, Y = 50 + i * 110 };
 
             StateHasChanged();
             await Task.Delay(300); // Wait for images to get downloaded. Use loaded event?
