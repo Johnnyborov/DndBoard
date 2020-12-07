@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace DndBoard.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("api/[controller]/[action]")]
     public class FileUploadController : ControllerBase
     {
         private readonly BoardsManager _boardManager;
@@ -21,6 +21,19 @@ namespace DndBoard.Server.Controllers
             _boardsHubContext = boardsHubContext;
         }
 
+
+
+        [HttpPost("{boardId}/{fileId}")]
+        public async Task<IActionResult> DeleteFile(string boardId, string fileId)
+        {
+            Board board = _boardManager.GetBoard(boardId);
+            board.DeleteFile(fileId);
+
+            await _boardsHubContext.Clients.Group(boardId)
+                .SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
+
+            return Ok();
+        }
 
         [HttpPost]
         public async Task PostFiles(UploadedFiles uploadedFiles)

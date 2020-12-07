@@ -68,7 +68,20 @@ namespace DndBoard.Client.Components
             uploadedFiles.Files = files.ToArray();
 
             await _httpClient.PostAsJsonAsync(
-                "/fileupload/PostFiles", uploadedFiles
+                "/api/fileupload/PostFiles", uploadedFiles
+            );
+        }
+
+        private async Task OnRightClick(MouseEventArgs mouseEventArgs)
+        {
+            Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
+            MapImage clickedImage = GetClickedImage(coords);
+            if (clickedImage is null)
+                return;
+
+            await _httpClient.PostAsync(
+                $"/api/FileUpload/DeleteFile/{_boardId}/{clickedImage.Id}",
+                null
             );
         }
 
@@ -135,7 +148,7 @@ namespace DndBoard.Client.Components
         private async Task ReloadFiles()
         {
             List<string> fileIds = await _httpClient.GetFromJsonAsync<List<string>>(
-                $"images/getfilesids/{_boardId}"
+                $"/api/images/getfilesids/{_boardId}"
             );
 
             _appState.MapImages = new(); // Old image refs become invalid, so recreate.

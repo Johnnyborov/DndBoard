@@ -9,13 +9,15 @@
 
 @foreach (var image in _appState.ModelImages)
 {
-    <img @ref="image.Ref" src="/images/getfile/@_boardId/@image.Id" hidden/>
+    <img @ref="image.Ref" src="/api/images/getfile/@_boardId/@image.Id" hidden/>
 }
 
 <div style="width: 700px; height: 700px; overflow-y: scroll;">
     <div
         @ref="DivCanvas"
-         @onclick="OnClick"
+        @onclick="OnClick"
+        @oncontextmenu="OnRightClick"
+        @oncontextmenu:preventDefault="true"
         style="background-color: yellow"
     >
         <BECanvas @ref="Canvas" Height="600" Width="600"></BECanvas>
