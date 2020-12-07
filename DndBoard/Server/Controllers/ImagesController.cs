@@ -30,29 +30,29 @@ namespace DndBoard.Server.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> PostFiles(
-            [FromForm(Name = "boardId")] string boardId,
-            [FromForm(Name = "file")] IEnumerable<IFormFile> files)
-        {
-            _logger.LogInformation($"---------------------{files}-----------------------");
+        //[HttpPost]
+        //public async Task<IActionResult> PostFiles(
+        //    [FromForm(Name = "boardId")] string boardId,
+        //    [FromForm(Name = "file")] IEnumerable<IFormFile> files)
+        //{
+        //    _logger.LogInformation($"---------------------{files}-----------------------");
 
-            //check if file was fully uploaded
-            if (files == null || files.Count() == 0)
-                return BadRequest("Upload a new File");
+        //    //check if file was fully uploaded
+        //    if (files == null || files.Count() == 0)
+        //        return BadRequest("Upload a new File");
 
-            foreach (IFormFile file in files)
-            {
-                using MemoryStream ms = new MemoryStream();
-                await file.CopyToAsync(ms);
+        //    foreach (IFormFile file in files)
+        //    {
+        //        using MemoryStream ms = new MemoryStream();
+        //        await file.CopyToAsync(ms);
 
-                Board board = _boardManager.GetBoard(boardId);
-                board.AddFile(ms.ToArray());
-            }
-            await _boardsHubContext.Clients.Group(boardId).SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
+        //        Board board = _boardManager.GetBoard(boardId);
+        //        board.AddFile(ms.ToArray());
+        //    }
+        //    await _boardsHubContext.Clients.Group(boardId).SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
 
-            return Ok("do something with this data....");
-        }
+        //    return Ok("do something with this data....");
+        //}
 
         [HttpGet("{boardId}/{fileId}")]
         public async Task<IActionResult> GetFile(string boardId, string fileId)

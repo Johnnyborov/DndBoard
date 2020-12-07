@@ -7,6 +7,8 @@
         @onmousedown="OnMouseDown"
         @onmouseup="OnMouseUp"
         @onmouseout="OnMouseOut"
+        @oncontextmenu="OnRightClick"
+        @oncontextmenu:preventDefault="true"
         style="background-color: yellow"
     >
         <BECanvas @ref="Canvas" Height="600" Width="600"></BECanvas>

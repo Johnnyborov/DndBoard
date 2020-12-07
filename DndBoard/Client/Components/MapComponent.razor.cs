@@ -20,13 +20,19 @@ namespace DndBoard.Client.Components
         protected override void OnInitialized()
         {
             _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
+            _appState.ChatHubManager.SetImageRemovedHandler(ImageRemovedHandler);
             _appState.FilesRefsChanged += OnFileRefsChanged;
             _appState.BoardIdChanged += boardId => Redraw();
         }
 
         private async Task OnFileRefsChanged()
         {
+            await Redraw();
+        }
 
+        private async void ImageRemovedHandler(string imageId)
+        {
+            _appState.MapImages.RemoveAll(img => img.Id == imageId);
             await Redraw();
         }
 
@@ -102,5 +108,12 @@ namespace DndBoard.Client.Components
             _clickedImage = null;
         private void OnMouseOut(MouseEventArgs mouseEventArgs) =>
             _clickedImage = null;
+
+        private async Task OnRightClick(MouseEventArgs mouseEventArgs)
+        {
+            MapImage clickedImage = await GetClickedImage(mouseEventArgs);
+            if (clickedImage is not null)
+                await _appState.ChatHubManager.SendImageRemoved(clickedImage.Id);
+        }
     }
 }

@@ -15,6 +15,13 @@ namespace DndBoard.Server.Hubs
             _boardsManager = boardsManager;
         }
 
+        [HubMethodName(BoardsHubContract.ImageRemoved)]
+        public async Task SendImageRemoved(string boardId, string imageId)
+        {
+            Board board = _boardsManager.GetBoard(boardId);
+            board.ImagesOnMap.RemoveAll(img => img.Id == imageId);
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.ImageRemoved, imageId);
+        }
 
         [HubMethodName(BoardsHubContract.RequestAllCoords)]
         public async Task RequestAllCoords(string boardId)
