@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoard.Client.BaseComponents;
 using DndBoard.Client.Helpers;
@@ -13,7 +12,7 @@ namespace DndBoard.Client.Components
 {
     public partial class MapComponent : CanvasBaseComponent
     {
-        private bool _pressed;
+        private MapImage _clickedImage;
         [Inject]
         private AppState _appState { get; set; }
 
@@ -64,30 +63,44 @@ namespace DndBoard.Client.Components
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
         {
-            if (_pressed)
+            if (_clickedImage is not null)
             {
                 Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
-                MapImage clickedImage = GetClickedImage(coords);
-                clickedImage.Coords = coords;
+
+                _clickedImage.Coords = coords;
 
                 CoordsChangeData coordsChangeData = new CoordsChangeData
                 {
-                    ImageId = clickedImage.Id,
+                    ImageId = _clickedImage.Id,
                     Coords = coords,
-                    ModelId = clickedImage.ModelId,
+                    ModelId = _clickedImage.ModelId,
                 };
                 string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
                 await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
             }
         }
 
-        private MapImage GetClickedImage(Coords coords)
+        private async Task<MapImage> GetClickedImage(MouseEventArgs mouseEventArgs)
         {
-            return _appState.MapImages[0];
+            Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
+
+            foreach (MapImage img in _appState.MapImages)
+            {
+                if (coords.X >= img.Coords.X && coords.X <= img.Coords.X + 100
+                    && coords.Y >= img.Coords.Y && coords.Y <= img.Coords.Y + 100)
+                {
+                    return img;
+                }
+            }
+
+            return null;
         }
 
-        private void OnMouseDown(MouseEventArgs mouseEventArgs) => _pressed = true;
-        private void OnMouseUp(MouseEventArgs mouseEventArgs) => _pressed = false;
-        private void OnMouseOut(MouseEventArgs mouseEventArgs) => _pressed = false;
+        private async Task OnMouseDown(MouseEventArgs mouseEventArgs) =>
+            _clickedImage = await GetClickedImage(mouseEventArgs);
+        private void OnMouseUp(MouseEventArgs mouseEventArgs) =>
+            _clickedImage = null;
+        private void OnMouseOut(MouseEventArgs mouseEventArgs) =>
+            _clickedImage = null;
     }
 }

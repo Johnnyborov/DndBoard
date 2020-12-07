@@ -76,6 +76,8 @@ namespace DndBoard.Client.Components
         {
             Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
             MapImage clickedImage = GetClickedImage(coords);
+            if (clickedImage is null)
+                return;
  
             CoordsChangeData coordsChangeData = new CoordsChangeData
             {
@@ -90,7 +92,16 @@ namespace DndBoard.Client.Components
 
         private MapImage GetClickedImage(Coords coords)
         {
-            return _appState.ModelImages[0];
+            foreach (MapImage img in _appState.ModelImages)
+            {
+                if (coords.X >= img.Coords.X && coords.X <= img.Coords.X + 100
+                    && coords.Y >= img.Coords.Y && coords.Y <= img.Coords.Y + 100)
+                {
+                    return img;
+                }
+            }
+
+            return null;
         }
 
         protected override void OnInitialized()
