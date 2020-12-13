@@ -52,5 +52,5 @@ jobs:
     - name: Deploy to ftp
       run: |
         echo Starting...
-        unbuffer lftp -c "debug; set ftp:ssl-protect-data true; set ftp:ssl-force true; set ssl:verify-certificate false; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_ADDRESS }}; mirror -R -v ${{ env.PUBLISH_DIR }} ${{ env.FTP_DIR }}"
+        unbuffer lftp -c "set ftp:ssl-protect-data true; set ftp:ssl-protect-list true; set ftp:ssl-auth TLS; set ftp:ssl-force true; set ssl:verify-certificate false; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_ADDRESS }}; mirror -R -v ${{ env.PUBLISH_DIR }} ${{ env.FTP_DIR }}"
         echo Done transferring files.
