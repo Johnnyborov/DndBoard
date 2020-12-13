@@ -7,7 +7,7 @@ on:
     branches: [ cicd ]
 
 env:
-  RUNNERS_WORK_DIR: /home/runner/work/DndBoard/DndBoard/
+  RUNNERS_WORK_DIR: /home/runner/work/DndBoard/DndBoard
  
 jobs:
   build:
