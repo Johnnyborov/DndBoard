@@ -1,6 +1,8 @@
 name: .NET Build and Deploy
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
 
 env:
   PUBLISH_DIR: /home/runner/work/DndBoard/DndBoard/DndBoard/Server/bin/Release/net5.0/publish
@@ -52,5 +54,5 @@ jobs:
     - name: Deploy to ftp
       run: |
         echo Starting FTP upload...
-        unbuffer lftp -c "set ftp:ssl-protect-data true; set ftp:ssl-protect-list true; set ftp:ssl-auth TLS; set ftp:ssl-force true; set ssl:verify-certificate false; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_ADDRESS }}; mirror -R -e -P 10 ${{ env.PUBLISH_DIR }} ${{ env.FTP_DIR }}"
+        unbuffer lftp -c "set ftp:ssl-protect-data true; set ftp:ssl-protect-list true; set ftp:ssl-auth TLS; set ftp:ssl-force true; set ssl:verify-certificate false; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_ADDRESS }}; mirror -R -e -v ${{ env.PUBLISH_DIR }} ${{ env.FTP_DIR }}"
         echo Done FTP upload.
