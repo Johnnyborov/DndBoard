@@ -7,7 +7,7 @@ on:
     branches: [ cicd ]
 
 env:
-  BASE_RUNNER_DIR: /home/runner/work/DndBoard/DndBoard/
+  RUNNERS_WORK_DIR: /home/runner/work/DndBoard/DndBoard/
  
 jobs:
   build:
@@ -43,6 +43,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: my-artifact
+        path: ./DndBoard/Server/bin/Release/net5.0/publish
  
     # Deploy to ftp
     - name: Deploy to ftp
@@ -54,4 +55,4 @@ jobs:
         protocol: ftps
         port: 21
         security: strict 
-        local-dir: ${{ env.BASE_RUNNER_DIR }}/DndBoard/Server/bin/Release/net5.0/publish/
+        local-dir: ${{ env.RUNNERS_WORK_DIR }}/DndBoard/Server/bin/Release/net5.0/publish/
