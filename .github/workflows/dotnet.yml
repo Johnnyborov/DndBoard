@@ -31,4 +31,5 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         protocol: ftps
         port: 21
+        security: strict 
         local-dir: /home/runner/work/DndBoard/DndBoard/DndBoard/Server/bin/Release/net5.0/publish/
