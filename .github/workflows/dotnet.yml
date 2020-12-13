@@ -1,10 +1,6 @@
 name: .NET Build and Deploy
 
-on:
-  push:
-    branches: [ cicd ]
-  pull_request:
-    branches: [ cicd ]
+on: [push, pull_request]
 
 env:
   PUBLISH_DIR: /home/runner/work/DndBoard/DndBoard/DndBoard/Server/bin/Release/net5.0/publish
@@ -48,7 +44,9 @@ jobs:
 
     # Install lftp
     - name: Install lftp
-      run: sudo apt-get install lftp
+      run: |
+        sudo apt-get install lftp
+        sudo apt-get install expect
       
     # Deploy to ftp
     - name: Deploy to ftp
