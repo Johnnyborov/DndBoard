@@ -7,7 +7,8 @@ on:
     branches: [ cicd ]
 
 env:
-  RUNNERS_WORK_DIR: /home/runner/work/DndBoard/DndBoard
+  PUBLISH_DIR: /home/runner/work/DndBoard/DndBoard/DndBoard/Server/bin/Release/net5.0/publish
+  FTP_DIR: .
  
 jobs:
   build:
@@ -44,15 +45,14 @@ jobs:
       with:
         name: my-artifact
         path: ./DndBoard/Server/bin/Release/net5.0/publish
- 
+
+    # Install lftp
+    - name: Install lftp
+      run: sudo apt-get install lftp
+      
     # Deploy to ftp
     - name: Deploy to ftp
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
-      with:
-        server: ${{ secrets.FTP_ADDRESS }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        protocol: ftps
-        port: 21
-        security: strict 
-        local-dir: ${{ env.RUNNERS_WORK_DIR }}/DndBoard/Server/bin/Release/net5.0/publish/
+      run: |
+        echo Starting...
+        unbuffer lftp -c "debug; set ftp:ssl-protect-data true; set ftp:ssl-force true; set ssl:verify-certificate false; open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_ADDRESS }}; mirror -R -v ${{ env.PUBLISH_DIR }} ${{ env.FTP_DIR }}"
+        echo Done transferring files.
