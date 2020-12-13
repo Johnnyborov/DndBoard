@@ -1,4 +1,4 @@
-name: .NET
+name: .NET Build and Deploy
 
 on:
   push:
@@ -6,21 +6,43 @@ on:
   pull_request:
     branches: [ cicd ]
 
+env:
+  BASE_RUNNER_DIR: /home/runner/work/DndBoard/DndBoard/
+ 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    name: Build
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.100
-
-    # Publish to folder
-    - name: Publish to folder
+ 
+    - name: Build with dotnet
+      run: dotnet build ./DndBoard/Server --configuration Release
+     
+    - name: Publish with dotnet
       run: dotnet publish ./DndBoard/Server --configuration Release
+     
+    - name: Publish artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-artifact
+        path: ./DndBoard/Server/bin/Release/net5.0/publish
+ 
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+ 
+    # Download artifacts
+    - name: Download artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: my-artifact
  
     # Deploy to ftp
     - name: Deploy to ftp
@@ -32,4 +54,4 @@ jobs:
         protocol: ftps
         port: 21
         security: strict 
-        local-dir: /home/runner/work/DndBoard/DndBoard/DndBoard/Server/bin/Release/net5.0/publish/
+        local-dir: ${{ env.BASE_RUNNER_DIR }}/DndBoard/Server/bin/Release/net5.0/publish/
