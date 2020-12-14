@@ -6,8 +6,8 @@ on:
 
 
 env:
-  PUBLISH_DIR_REL: D:\a\DndBoard\DndBoard\DndBoard\Server\bin\Release\net5.0\publish\
-  APP_OFFLINE_DIR: D:\a\DndBoard\DndBoard\deploy\app_offline_dir\
+  PUBLISH_DIR_REL: DndBoard\Server\bin\Release\net5.0\publish\
+  APP_OFFLINE_DIR: deploy\app_offline_dir\
   WEBSITE_CONTENT_PATH: ${{ secrets.WEBSITE_CONTENT_PATH }}
   IIS_SERVER_COMPUTER_NAME: ${{ secrets.IIS_SERVER_COMPUTER_NAME }}
   IIS_SERVER_USERNAME: ${{ secrets.IIS_SERVER_USERNAME }}
@@ -42,11 +42,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - shell: cmd
-      run: 'echo %CD%'
-    - shell: cmd
-      run: 'echo ${{ env.GITHUB_WORKSPACE }}'
-      
+
     # Download artifacts
     - name: Download artifacts
       uses: actions/download-artifact@v2
@@ -57,10 +53,10 @@ jobs:
     # Take application offline
     - name: Take application offline
       shell: cmd
-      run: '"C:/Program Files (x86)/IIS/Microsoft Web Deploy V3/msdeploy.exe" -verb:sync -allowUntrusted -source:contentPath="${{ env.APP_OFFLINE_DIR }}" -skip:skipaction="Delete" -dest:contentPath="${{ env.WEBSITE_CONTENT_PATH }}",computerName="${{ env.IIS_SERVER_COMPUTER_NAME }}",username="${{ env.IIS_SERVER_USERNAME }}",password="${{ env.IIS_SERVER_PASSWORD }}",authtype="Basic"'
+      run: '"C:/Program Files (x86)/IIS/Microsoft Web Deploy V3/msdeploy.exe" -verb:sync -allowUntrusted -source:contentPath="$%CD%\{{ env.APP_OFFLINE_DIR }}" -skip:skipaction="Delete" -dest:contentPath="${{ env.WEBSITE_CONTENT_PATH }}",computerName="${{ env.IIS_SERVER_COMPUTER_NAME }}",username="${{ env.IIS_SERVER_USERNAME }}",password="${{ env.IIS_SERVER_PASSWORD }}",authtype="Basic"'
     
     # Deploy Application
     - name: Deploy Application
       shell: cmd
-      run: '"C:/Program Files (x86)/IIS/Microsoft Web Deploy V3/msdeploy.exe" -verb:sync -allowUntrusted -source:contentPath="${{ env.PUBLISH_DIR_REL }}" -dest:contentPath="${{ env.WEBSITE_CONTENT_PATH }}",computerName="${{ env.IIS_SERVER_COMPUTER_NAME }}",username="${{ env.IIS_SERVER_USERNAME }}",password="${{ env.IIS_SERVER_PASSWORD }}",authtype="Basic"'
+      run: '"C:/Program Files (x86)/IIS/Microsoft Web Deploy V3/msdeploy.exe" -verb:sync -allowUntrusted -source:contentPath="$%CD%\{{ env.PUBLISH_DIR_REL }}" -dest:contentPath="${{ env.WEBSITE_CONTENT_PATH }}",computerName="${{ env.IIS_SERVER_COMPUTER_NAME }}",username="${{ env.IIS_SERVER_USERNAME }}",password="${{ env.IIS_SERVER_PASSWORD }}",authtype="Basic"'
     
