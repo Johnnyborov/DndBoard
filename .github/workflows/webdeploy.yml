@@ -41,7 +41,12 @@ jobs:
     name: Deploy
     runs-on: windows-latest
     steps:
- 
+    - uses: actions/checkout@v2
+    - shell: cmd
+      run: 'echo %CD%'
+    - shell: cmd
+      run: 'echo ${{ env.GITHUB_WORKSPACE }}'
+      
     # Download artifacts
     - name: Download artifacts
       uses: actions/download-artifact@v2
