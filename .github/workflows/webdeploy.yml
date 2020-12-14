@@ -6,8 +6,8 @@ on:
 
 
 env:
-  PUBLISH_DIR_REL: %CD%\DndBoard\Server\bin\Release\net5.0\publish
-  APP_OFFLINE_DIR: %CD%\deploy\app_offline_dir
+  PUBLISH_DIR_REL: DndBoard\Server\bin\Release\net5.0\publish
+  APP_OFFLINE_DIR: deploy\app_offline_dir
   WEBSITE_CONTENT_PATH: ${{ secrets.WEBSITE_CONTENT_PATH }}
   IIS_SERVER_COMPUTER_NAME: ${{ secrets.IIS_SERVER_COMPUTER_NAME }}
   IIS_SERVER_USERNAME: ${{ secrets.IIS_SERVER_USERNAME }}
