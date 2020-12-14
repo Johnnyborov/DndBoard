@@ -2,7 +2,7 @@ name: Dotnet Build-MSDeploy
 
 on:
   push:
-    branches: [ webdeploy ]
+    branches: [ master ]
 
 
 env:
