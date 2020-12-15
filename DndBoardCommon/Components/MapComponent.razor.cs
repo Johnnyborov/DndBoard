@@ -69,17 +69,18 @@ namespace DndBoardCommon.Components
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
         {
-            if (_clickedImage is not null)
+            MapImage mapImage = _clickedImage;
+            if (mapImage is not null)
             {
                 Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
 
-                _clickedImage.Coords = coords;
+                mapImage.Coords = coords;
 
                 CoordsChangeData coordsChangeData = new CoordsChangeData
                 {
-                    ImageId = _clickedImage.Id,
+                    ImageId = mapImage.Id,
                     Coords = coords,
-                    ModelId = _clickedImage.ModelId,
+                    ModelId = mapImage.ModelId,
                 };
                 string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
                 await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
