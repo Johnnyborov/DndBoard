@@ -7,6 +7,7 @@ using DndBoardCommon.Store;
 using DndBoard.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace DndBoardCommon.Components
 {
@@ -15,25 +16,36 @@ namespace DndBoardCommon.Components
         private MapImage _clickedImage;
         [Inject]
         private AppState _appState { get; set; }
+        [Inject]
+        private IJSRuntime _jsRuntime { get; set; }
 
-
-        protected override void OnInitialized()
+        private bool _initialized = false;
+        protected override async Task OnInitializedAsync()
         {
+            if (_initialized)
+                return;
+            else
+                _initialized = true;
+
             _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
             _appState.ChatHubManager.SetImageRemovedHandler(ImageRemovedHandler);
             _appState.FilesRefsChanged += OnFileRefsChanged;
-            _appState.BoardIdChanged += boardId => Redraw();
+            _appState.BoardIdChanged += boardId => QueueRedraw();
+
+            await _jsRuntime.InvokeAsync<object>(
+                "initMapComponent", DotNetObjectReference.Create(this)
+            );
         }
 
         private async Task OnFileRefsChanged()
         {
-            await Redraw();
+            await QueueRedraw();
         }
 
         private async void ImageRemovedHandler(string imageId)
         {
             _appState.MapImages.RemoveAll(img => img.Id == imageId);
-            await Redraw();
+            await QueueRedraw();
         }
 
         private async void CoordsReceivedHandler(string coordsChangeDataJson)
@@ -59,11 +71,20 @@ namespace DndBoardCommon.Components
                     .Coords = coordsChangeData.Coords;
             }
 
-            await Redraw();
+            await QueueRedraw();
         }
 
-        private async Task Redraw()
+        private async Task QueueRedraw()
         {
+            await _jsRuntime.InvokeAsync<object>("queueRedraw");
+        }
+
+        [JSInvokable]
+        public async Task Redraw()
+        {
+            if (_appState.MapImages is null)
+                return;
+
             await CanvasMapRenderer.RedrawImagesByCoords(Canvas, _appState.MapImages);
         }
 
