@@ -6,7 +6,7 @@ on:
 
 
 env:
-  PUBLISH_DIR_REL: DndBoard\Server\bin\Release\net5.0\publish\
+  PUBLISH_DIR_REL: DndBoardServer\bin\Release\net5.0\publish\
   APP_OFFLINE_DIR: deploy\app_offline_dir\
   WEBSITE_CONTENT_PATH: ${{ secrets.WEBSITE_CONTENT_PATH }}
   IIS_SERVER_COMPUTER_NAME: ${{ secrets.IIS_SERVER_COMPUTER_NAME }}
@@ -25,16 +25,16 @@ jobs:
         dotnet-version: 5.0.100
  
     - name: Build with dotnet
-      run: dotnet build ./DndBoard/Server --configuration Release
+      run: dotnet build ./DndBoardServer --configuration Release
      
     - name: Publish with dotnet
-      run: dotnet publish ./DndBoard/Server --configuration Release
+      run: dotnet publish ./DndBoardServer --configuration Release
      
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
       with:
         name: my-artifact
-        path: ./DndBoard/Server/bin/Release/net5.0/publish
+        path: ./DndBoardServer/bin/Release/net5.0/publish
  
   deploy:
     needs: build
@@ -48,7 +48,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: my-artifact
-        path: ./DndBoard/Server/bin/Release/net5.0/publish
+        path: ./DndBoardServer/bin/Release/net5.0/publish
 
     # Take application offline
     - name: Take application offline
