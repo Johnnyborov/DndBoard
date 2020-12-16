@@ -1,23 +1,25 @@
-﻿@*@inherits CanvasBaseComponent
+﻿@inherits CanvasBaseComponent
 
 <h3>Images</h3>
 
 @_boardId
 <p>
-    <input @ref="_files" type="file" multiple />
+    <InputFile OnChange="@OnInputFileChange" multiple />
 </p>
 
-@if (_filesIds != null)
-@foreach (string fileId in _filesIds)
+@foreach (var image in _appState.ModelImages)
 {
-    <img @ref="_filesRefs[fileId]" src="/images/getfile/@_boardId/@fileId" hidden/>
+    <img @ref="image.Ref" src="/api/images/getfile/@_boardId/@image.Id" hidden/>
 }
 
 <div style="width: 700px; height: 700px; overflow-y: scroll;">
     <div
         @ref="DivCanvas"
+        @onclick="OnClick"
+        @oncontextmenu="OnRightClick"
+        @oncontextmenu:preventDefault="true"
         style="background-color: yellow"
     >
         <BECanvas @ref="Canvas" Height="600" Width="600"></BECanvas>
     </div>
-</div>*@
+</div>
