@@ -1,0 +1,6 @@
+<Project>
+  <Sdk Name="Microsoft.NET.Sdk.Web" />
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+</Project>

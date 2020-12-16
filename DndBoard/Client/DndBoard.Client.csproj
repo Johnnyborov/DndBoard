@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <ParentProject>wasmclient</ParentProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shared\DndBoard.Shared.csproj" />
+    <ProjectReference Include="..\..\DndBoardCommon\DndBoardCommon.csproj" />
   </ItemGroup>
 
 </Project>
