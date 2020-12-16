@@ -57,6 +57,25 @@
         function queueRedraw() {
             //window.requestAnimationFrame(redraw);
         }
+        function clearMapCanvas() {
+                        console.log(111);
+            var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];;
+            var canvasW = mapCanvas.getBoundingClientRect().width;
+            var canvasH = mapCanvas.getBoundingClientRect().height;
+
+            var ctx = mapCanvas.getContext('2d');
+            ctx.clearRect(0, 0, canvasW, canvasH);
+            ctx.fillStyle = 'rgb(0,200,0)';
+            ctx.fillRect(0, 0, canvasW, canvasH);
+        }
+        function redrawImages(img, x, y) {
+                        console.log(222);
+                        console.log(x, y);
+                        console.log(img);
+            var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];;
+            var ctx = mapCanvas.getContext('2d');
+            ctx.drawImage(img, x, y);
+        }
     </script>
 </body>
 </html>

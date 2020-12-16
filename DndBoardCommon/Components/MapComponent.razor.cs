@@ -85,7 +85,7 @@ namespace DndBoardCommon.Components
             if (_appState.MapImages is null)
                 return;
 
-            await CanvasMapRenderer.RedrawImagesByCoords(Canvas, _appState.MapImages);
+            await CanvasMapRenderer.RedrawImagesByCoordsJS(_jsRuntime, _appState.MapImages);
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)

@@ -6,6 +6,7 @@ using Blazor.Extensions;
 using Blazor.Extensions.Canvas.Canvas2D;
 using DndBoardCommon.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace DndBoardCommon.Helpers
 {
@@ -27,6 +28,29 @@ namespace DndBoardCommon.Helpers
                 foreach (MapImage img in images)
                 {
                     await context.DrawImageAsync(img.Ref, img.Coords.X, img.Coords.Y);
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public static async Task RedrawImagesByCoordsJS(
+            IJSRuntime jsRuntime,
+            List<MapImage> images)
+        {
+            await _semaphore.WaitAsync();
+            try
+            {
+                await jsRuntime.InvokeAsync<object>("clearMapCanvas");
+
+                foreach (MapImage img in images)
+                {
+                    await jsRuntime.InvokeAsync<object>(
+                        "redrawImages",
+                        new object[] { img.Ref, img.Coords.X, img.Coords.Y }
+                    );
                 }
             }
             finally
