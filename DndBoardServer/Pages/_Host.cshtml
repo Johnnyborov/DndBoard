@@ -35,40 +35,6 @@
 
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/Blazor.Extensions.Canvas/blazor.extensions.canvas.js"></script>
-        <script>
-        function getElementOffsets(el) {
-            var elRect = el.getBoundingClientRect();
-            var obj = {};
-            obj.offsetLeft = Math.floor(elRect.left);
-            obj.offsetTop = Math.floor(elRect.top);
-            return JSON.stringify(obj);
-        }
-    </script>
-    <script>
-        var mapComponentInstance;
-        function initMapComponent(instance) {
-            mapComponentInstance = instance;
-            window.requestAnimationFrame(redraw);
-        }
-        function redraw() {
-            mapComponentInstance.invokeMethodAsync('Redraw');
-            window.requestAnimationFrame(redraw);
-        }
-        function clearMapCanvas() {
-            var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];;
-            var canvasW = mapCanvas.getBoundingClientRect().width;
-            var canvasH = mapCanvas.getBoundingClientRect().height;
-
-            var ctx = mapCanvas.getContext('2d');
-            ctx.clearRect(0, 0, canvasW, canvasH);
-            ctx.fillStyle = 'rgb(0,200,0)';
-            ctx.fillRect(0, 0, canvasW, canvasH);
-        }
-        function redrawImages(img, x, y) {
-            var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];;
-            var ctx = mapCanvas.getContext('2d');
-            ctx.drawImage(img, x, y);
-        }
-    </script>
+    <script src="_content/DndBoardCommon/js/commonScripts.js"></script>
 </body>
 </html>
