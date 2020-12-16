@@ -10,8 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Client\DndBoard.Client.csproj" />
-    <ProjectReference Include="..\Shared\DndBoard.Shared.csproj" />
   </ItemGroup>
-
 
 </Project>

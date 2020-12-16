@@ -1,0 +1,13 @@
+﻿@inherits ComponentBase
+
+<h3>Board</h3>
+
+Board ID:
+<input @bind="_boardId" />
+<button @onclick="ConnectAsync">Connect</button>
+
+<MapComponent></MapComponent>
+@if (_connectedBoardId != null)
+{
+    <ImagesComponent></ImagesComponent>
+}

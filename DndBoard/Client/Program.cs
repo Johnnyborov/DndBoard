@@ -1,8 +1,9 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DndBoard.Client.Helpers;
-using DndBoard.Client.Store;
+using DndBoardCommon;
+using DndBoardCommon.Helpers;
+using DndBoardCommon.Store;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
