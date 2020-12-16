@@ -29,26 +29,19 @@ namespace DndBoardCommon.Components
 
             _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
             _appState.ChatHubManager.SetImageRemovedHandler(ImageRemovedHandler);
-            _appState.FilesRefsChanged += OnFileRefsChanged;
-            _appState.BoardIdChanged += boardId => QueueRedraw();
 
             await _jsRuntime.InvokeAsync<object>(
                 "initMapComponent", DotNetObjectReference.Create(this)
             );
         }
 
-        private async Task OnFileRefsChanged()
-        {
-            await QueueRedraw();
-        }
-
-        private async void ImageRemovedHandler(string imageId)
+        
+        private void ImageRemovedHandler(string imageId)
         {
             _appState.MapImages.RemoveAll(img => img.Id == imageId);
-            await QueueRedraw();
         }
 
-        private async void CoordsReceivedHandler(string coordsChangeDataJson)
+        private void CoordsReceivedHandler(string coordsChangeDataJson)
         {
             CoordsChangeData coordsChangeData = JsonSerializer
                 .Deserialize<CoordsChangeData>(coordsChangeDataJson);
@@ -70,13 +63,6 @@ namespace DndBoardCommon.Components
                 _appState.MapImages.Find(img => img.Id == coordsChangeData.ImageId)
                     .Coords = coordsChangeData.Coords;
             }
-
-            await QueueRedraw();
-        }
-
-        private async Task QueueRedraw()
-        {
-            await _jsRuntime.InvokeAsync<object>("queueRedraw");
         }
 
         [JSInvokable]

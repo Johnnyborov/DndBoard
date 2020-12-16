@@ -15,7 +15,10 @@ namespace DndBoardCommon.Store
         public event BoardIdChangedHandler BoardIdChanged;
 
         public async Task InvokeFilesRefsChanged()
-            => await FilesRefsChanged?.Invoke();
+        { // null conditional operator doesn't work. GG.
+            if (FilesRefsChanged is not null)
+                await FilesRefsChanged.Invoke();
+        }
         public async Task InvokeBoardIdChanged(string boardId)
             => await BoardIdChanged?.Invoke(boardId);
     }
