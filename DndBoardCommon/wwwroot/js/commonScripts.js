@@ -26,10 +26,16 @@ function clearMapCanvas() {
     ctx.fillStyle = 'rgb(0,200,0)';
     ctx.fillRect(0, 0, canvasW, canvasH);
 }
-function redrawImages(img, x, y) {
+function redrawImage(img, x, y) {
     var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];;
     var ctx = mapCanvas.getContext('2d');
     ctx.drawImage(img, x, y);
+}
+function redrawAllImages(imgList) {
+    clearMapCanvas();
+    for (var i = 0; i < imgList.length; i++) {
+        redrawImage(imgList[i].ref, imgList[i].x, imgList[i].y);
+    }
 }
 
 /*

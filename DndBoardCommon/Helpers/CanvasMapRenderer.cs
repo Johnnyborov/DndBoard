@@ -44,15 +44,14 @@ namespace DndBoardCommon.Helpers
             await _semaphore.WaitAsync();
             try
             {
-                await jsRuntime.InvokeAsync<object>("clearMapCanvas");
-
+                List<object> imgList = new();
                 foreach (MapImage img in images)
-                {
-                    await jsRuntime.InvokeAsync<object>(
-                        "redrawImages",
-                        new object[] { img.Ref, img.Coords.X, img.Coords.Y }
-                    );
-                }
+                    imgList.Add(new { img.Ref, img.Coords.X, img.Coords.Y });
+
+                await jsRuntime.InvokeAsync<object>(
+                    "redrawAllImages",
+                    new object[] { imgList }
+                );
             }
             finally
             {
