@@ -17,7 +17,7 @@ function redraw() {
     window.requestAnimationFrame(redraw);
 }
 function clearMapCanvas() {
-    var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];;
+    var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];
     var canvasW = mapCanvas.getBoundingClientRect().width;
     var canvasH = mapCanvas.getBoundingClientRect().height;
 
