@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoardCommon.BaseComponents;
@@ -22,6 +21,8 @@ namespace DndBoardCommon.Components
 
         [Inject]
         private IFilesClient _Client { get; set; }
+        [Inject]
+        private CanvasMapRenderer _canvasMapRenderer { get; set; }
         [Inject]
         private AppState _appState { get; set; }
 
@@ -45,7 +46,7 @@ namespace DndBoardCommon.Components
             string format = "image/png";
 
             IBrowserFile resizedImageFile = await imageFile
-                                .RequestImageFileAsync(format, 100, 100);
+                .RequestImageFileAsync(format, 100, 100);
 
             Stream stream = resizedImageFile.OpenReadStream();
             MemoryStream ms = new MemoryStream();
@@ -130,7 +131,7 @@ namespace DndBoardCommon.Components
 
         private async Task Redraw()
         {
-            await CanvasMapRenderer.RedrawImagesByCoords(Canvas, _appState.ModelImages);
+            await _canvasMapRenderer.RedrawImagesByCoords(Canvas, _appState.ModelImages);
         }
 
         private async Task OnBoardIdChanged(string boardId)

@@ -17,6 +17,8 @@ namespace DndBoardCommon.Components
         [Inject]
         private AppState _appState { get; set; }
         [Inject]
+        private CanvasMapRenderer _canvasMapRenderer { get; set; }
+        [Inject]
         private IJSRuntime _jsRuntime { get; set; }
 
         private bool _initialized = false;
@@ -71,7 +73,7 @@ namespace DndBoardCommon.Components
             if (_appState.MapImages is null)
                 return;
 
-            await CanvasMapRenderer.RedrawImagesByCoordsJS(_jsRuntime, _appState.MapImages);
+            await _canvasMapRenderer.RedrawImagesByCoordsJS(_jsRuntime, _appState.MapImages);
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)

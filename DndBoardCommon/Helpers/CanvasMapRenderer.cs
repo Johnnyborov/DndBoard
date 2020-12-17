@@ -12,8 +12,9 @@ namespace DndBoardCommon.Helpers
 {
     public class CanvasMapRenderer
     {
-        private static SemaphoreSlim _semaphore = new SemaphoreSlim(1);
-        public static async Task RedrawImagesByCoords(
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+
+        public async Task RedrawImagesByCoords(
             BECanvasComponent canvas,
             List<MapImage> images)
         {
@@ -36,7 +37,7 @@ namespace DndBoardCommon.Helpers
             }
         }
 
-        public static async Task RedrawImagesByCoordsJS(
+        public async Task RedrawImagesByCoordsJS(
             IJSRuntime jsRuntime,
             List<MapImage> images)
         {
