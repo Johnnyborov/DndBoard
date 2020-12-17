@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using DndBoard.Shared;
+using DndBoardCommon;
 using DndBoardCommon.Helpers;
 using DndBoardCommon.Store;
 using DndBoardServer.Hubs;
@@ -28,14 +29,13 @@ namespace DndBoardServer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:5001") });
             services.AddTransient<CanvasMapRenderer>();
             services.AddTransient<ChatHubManager>();
             services.AddScoped<AppState>();
 
             services.AddTransient<BoardsManager>();
             services.AddSignalR();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddControllersAsServices();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddResponseCompression(opts =>
@@ -43,6 +43,8 @@ namespace DndBoardServer
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                     new[] { "application/octet-stream" });
             });
+
+            services.AddTransient<IFilesClient, ServerFilesClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

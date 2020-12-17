@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -22,7 +21,7 @@ namespace DndBoardCommon.Components
         private string _boardId;
 
         [Inject]
-        private HttpClient _httpClient { get; set; }
+        private IFilesClient _Client { get; set; }
         [Inject]
         private AppState _appState { get; set; }
 
@@ -67,9 +66,7 @@ namespace DndBoardCommon.Components
             uploadedFiles.BoardId = _boardId;
             uploadedFiles.Files = files.ToArray();
 
-            await _httpClient.PostAsJsonAsync(
-                "/api/fileupload/PostFiles", uploadedFiles
-            );
+            await _Client.PostFilesAsJsonAsync(uploadedFiles);
         }
 
         private async Task OnRightClick(MouseEventArgs mouseEventArgs)
@@ -79,10 +76,7 @@ namespace DndBoardCommon.Components
             if (clickedImage is null)
                 return;
 
-            await _httpClient.PostAsync(
-                $"/api/FileUpload/DeleteFile/{_boardId}/{clickedImage.Id}",
-                null
-            );
+            await _Client.DeleteFilesAsync(_boardId, clickedImage.Id);
         }
 
         private async Task OnClick(MouseEventArgs mouseEventArgs)
@@ -147,9 +141,7 @@ namespace DndBoardCommon.Components
 
         private async Task ReloadFiles()
         {
-            List<string> fileIds = await _httpClient.GetFromJsonAsync<List<string>>(
-                $"/api/images/getfilesids/{_boardId}"
-            );
+            List<string> fileIds = await _Client.GetFilesListAsJsonAsync(_boardId);
 
             _appState.MapImages = new(); // Old image refs become invalid, so recreate.
             _appState.ModelImages = new(); // Otherwise existing refs don't get updated.
