@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
@@ -62,18 +63,49 @@ namespace DndBoard.SeleniumTests
 
             IWebElement files = driver.FindElementByXPath("//*[@type='file']");
             files.SendKeys($"{_dataDir}/blueSquare.png");
+            Thread.Sleep(500);
 
-            IWebElement imgCanvas = driver.FindElementById("ImagesDivCanvas");
-            Actions actions = new Actions(driver);
-            actions.MoveToElement(imgCanvas, 50, 50).Perform();
+            IWebElement imgCanvas = driver.FindElementByCssSelector("#ImagesDivCanvas > canvas");
+            Actions actions = MoveToElemCorner(driver, imgCanvas);
+            actions.MoveByOffset(50, 50).Perform();
             actions.Click().Perform();
+            Thread.Sleep(500);
 
-            IWebElement mapCanvas = driver.FindElementById("MapCanvasDiv");
+            IWebElement mapCanvas = driver.FindElementByCssSelector("#MapCanvasDiv > canvas");
             Dictionary<string, int> pixel1 = GetPixel(driver, 50, 50);
             Dictionary<string, int> pixel2 = GetPixel(driver, 250, 250);
 
             Assert.True(IsBluePixel(pixel1));
             Assert.False(IsBluePixel(pixel2));
+
+            Draw(driver, mapCanvas);
+            Thread.Sleep(500);
+
+            Dictionary<string, int> pixel3 = GetPixel(driver, 50, 50);
+            Dictionary<string, int> pixel4 = GetPixel(driver, 350, 350);
+
+            Assert.False(IsBluePixel(pixel3));
+            Assert.True(IsBluePixel(pixel4));
+        }
+
+        private static void Draw(ChromeDriver driver, IWebElement mapCanvas)
+        {
+            Actions actions = MoveToElemCorner(driver, mapCanvas);
+            actions.MoveByOffset(50, 50).Perform();
+            actions.ClickAndHold().Perform();
+            Thread.Sleep(100);
+            actions.MoveByOffset(250, 250).Perform();
+            Thread.Sleep(100);
+            actions.Release().Perform();
+        }
+
+        private static Actions MoveToElemCorner(ChromeDriver driver, IWebElement mapCanvas)
+        {
+            driver.ExecuteScript("window.scrollTo(0, arguments[0].getBoundingClientRect().top)", mapCanvas);
+            int offsetY = (int)(dynamic)driver.ExecuteScript("return arguments[0].getBoundingClientRect().top;", mapCanvas);
+            var actions = new Actions(driver);
+            actions.MoveToElement(mapCanvas, 1, 1 + offsetY).Perform();
+            return actions;
         }
 
         private static Dictionary<string, int> GetPixel(ChromeDriver driver, int x, int y)
