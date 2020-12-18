@@ -3,8 +3,8 @@
 <h3>Board</h3>
 
 Board ID:
-<input @bind="_boardId" />
-<button @onclick="ConnectAsync">Connect</button>
+<input @bind="_boardId" id="boardId" />
+<button @onclick="ConnectAsync" class="btn-primary">Connect</button>
 
 <MapComponent></MapComponent>
 @if (_connectedBoardId != null)
