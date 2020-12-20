@@ -1,9 +1,8 @@
-name: Dotnet Build-MSDeploy
+name: Dotnet Build-Test-MSDeploy
 
 on:
   push:
     branches: [ selenium ]
-
 
 env:
   PUBLISH_DIR_REL: DndBoard\Server\bin\Release\net5.0\publish\
@@ -13,9 +12,47 @@ env:
   IIS_SERVER_USERNAME: ${{ secrets.IIS_SERVER_USERNAME }}
   IIS_SERVER_PASSWORD: ${{ secrets.IIS_SERVER_PASSWORD }}
  
-jobs:
-  build:
-    name: Build
+jobs: 
+  build-and-test:
+    name: Build and Test
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET 3.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.404
+
+    - name: Setup .NET 5.0
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.100
+
+    - name: Build server
+      run: dotnet build ./DndBoard/Server -c Release
+
+    - name: Build selenium tests
+      run: dotnet build ./Tests/DndBoard.SeleniumTests -c Release
+
+    - name: Download ChromeDriver
+      shell: pwsh
+      run: |
+        $ChromeVersionInfo = (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(Default)').VersionInfo
+        Write-Output $ChromeVersionInfo
+        $ChromeVersion = $ChromeVersionInfo.ProductVersion
+        $ChromeDriverUrl = "https://chromedriver.storage.googleapis.com/" + $ChromeVersion + "/chromedriver_win32.zip"
+        cd ./Tests/DndBoard.SeleniumTests/bin/Release/netcoreapp3.1;
+        Invoke-WebRequest -Uri $ChromeDriverUrl -OutFile ./chromedriver_win32.zip;
+        Expand-Archive ./chromedriver_win32.zip -DestinationPath ./chromedriver_win32;
+        Copy-Item ./chromedriver_win32/chromedriver.exe -Destination .;
+      
+    - name: Run selenium tests (which build and run server)
+      run: dotnet test ./Tests/DndBoard.SeleniumTests -c Release
+ 
+ publish:
+    needs: build-and-test
+    name: Publish
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -36,44 +73,9 @@ jobs:
       with:
         name: my-artifact
         path: ./DndBoard/Server/bin/Release/net5.0/publish
-    
-  test:
-    needs: build
-    name: Test
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
 
-    - name: Setup .NET 3.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.404
-
-    - name: Setup .NET 5.0
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.100
-
-    - name: Build selenium tests
-      run: dotnet build ./Tests/DndBoard.SeleniumTests -c Release
-
-    - name: Download ChromeDriver
-      shell: pwsh
-      run: |
-        $ChromeVersionInfo = (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(Default)').VersionInfo
-        Write-Output $ChromeVersionInfo
-        $ChromeVersion = $ChromeVersionInfo.ProductVersion
-        $ChromeDriverUrl = "https://chromedriver.storage.googleapis.com/" + $ChromeVersion + "/chromedriver_win32.zip"
-        cd ./Tests/DndBoard.SeleniumTests/bin/Release/netcoreapp3.1;
-        Invoke-WebRequest -Uri $ChromeDriverUrl -OutFile ./chromedriver_win32.zip;
-        Expand-Archive ./chromedriver_win32.zip -DestinationPath ./chromedriver_win32;
-        Copy-Item ./chromedriver_win32/chromedriver.exe -Destination .;
-      
-    - name: Run selenium tests (which build and run server)
-      run: dotnet test ./Tests/DndBoard.SeleniumTests -c Release
- 
   deploy:
-    needs: [build, test]
+    needs: [build-and-test, publish]
     name: Deploy
     runs-on: windows-latest
     steps:
