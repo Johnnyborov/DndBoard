@@ -33,7 +33,7 @@ namespace DndBoard.SeleniumTests
             buildProcess.StartInfo.WorkingDirectory = ServerProjDir;
             buildProcess.StartInfo.FileName = DotnetCmdName;
             buildProcess.StartInfo.UseShellExecute = false;
-            buildProcess.StartInfo.Arguments = "build .";
+            buildProcess.StartInfo.Arguments = "build . -c Release";
             buildProcess.Start();
             buildProcess.Kill();
         }
@@ -44,7 +44,7 @@ namespace DndBoard.SeleniumTests
             _process.StartInfo.WorkingDirectory = ServerProjDir;
             _process.StartInfo.FileName = DotnetCmdName;
             _process.StartInfo.UseShellExecute = false;
-            _process.StartInfo.Arguments = "run .";
+            _process.StartInfo.Arguments = "run . -c Release";
             _process.Start();
         }
 
