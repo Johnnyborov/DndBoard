@@ -26,6 +26,7 @@ namespace DndBoard.SeleniumTests
 
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("headless");
+            options.AddArgument("ignore-certificate-errors");
             _driver = new ChromeDriver(".", options);
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
 
@@ -41,7 +42,7 @@ namespace DndBoard.SeleniumTests
         [Fact]
         public void Test1()
         {
-            _driver.Navigate().GoToUrl("https://localhost:5001/board");
+            _driver.Navigate().GoToUrl("https://127.0.0.1:5001/board");
             ConnectToBoard();
             UploadIcon();
             AddIconToMap();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using Xunit;
 
 namespace DndBoard.SeleniumTests
@@ -46,6 +47,7 @@ namespace DndBoard.SeleniumTests
             _process.StartInfo.UseShellExecute = false;
             _process.StartInfo.Arguments = "run . -c Release";
             _process.Start();
+            Thread.Sleep(2500);
         }
 
         public void StopServer()
