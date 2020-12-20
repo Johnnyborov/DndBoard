@@ -5,8 +5,8 @@ on:
     branches: [ master ]
 
 env:
-  PUBLISH_DIR_REL: DndBoard\Server\bin\Release\net5.0\publish\
-  APP_OFFLINE_DIR: deploy\app_offline_dir\
+  PUBLISH_DIR_REL: Src\DndBoard\WasmServer\bin\Release\net5.0\publish\
+  APP_OFFLINE_DIR: Deploy\app_offline_dir\
   WEBSITE_CONTENT_PATH: ${{ secrets.WEBSITE_CONTENT_PATH }}
   IIS_SERVER_COMPUTER_NAME: ${{ secrets.IIS_SERVER_COMPUTER_NAME }}
   IIS_SERVER_USERNAME: ${{ secrets.IIS_SERVER_USERNAME }}
@@ -30,10 +30,10 @@ jobs:
         dotnet-version: 5.0.100
 
     - name: Build server
-      run: dotnet build ./DndBoard/Server -c Release
+      run: dotnet build ./Src/DndBoard/WasmServer -c Release
 
     - name: Build selenium tests
-      run: dotnet build ./Tests/DndBoard.SeleniumTests -c Release
+      run: dotnet build ./Tests/DndBoard/SeleniumTests -c Release
 
     - name: Download ChromeDriver
       shell: pwsh
@@ -42,13 +42,13 @@ jobs:
         Write-Output $ChromeVersionInfo
         $ChromeVersion = $ChromeVersionInfo.ProductVersion
         $ChromeDriverUrl = "https://chromedriver.storage.googleapis.com/" + $ChromeVersion + "/chromedriver_win32.zip"
-        cd ./Tests/DndBoard.SeleniumTests/bin/Release/netcoreapp3.1;
+        cd ./Tests/DndBoard/SeleniumTests/bin/Release/netcoreapp3.1;
         Invoke-WebRequest -Uri $ChromeDriverUrl -OutFile ./chromedriver_win32.zip;
         Expand-Archive ./chromedriver_win32.zip -DestinationPath ./chromedriver_win32;
         Copy-Item ./chromedriver_win32/chromedriver.exe -Destination .;
       
     - name: Run selenium tests (which build and run server)
-      run: dotnet test ./Tests/DndBoard.SeleniumTests -c Release
+      run: dotnet test ./Tests/DndBoard/SeleniumTests -c Release
 
   publish:
     needs: build-and-test
@@ -63,16 +63,16 @@ jobs:
         dotnet-version: 5.0.100
  
     - name: Build with dotnet
-      run: dotnet build ./DndBoard/Server --configuration Release
+      run: dotnet build ./Src/DndBoard/WasmServer --configuration Release
      
     - name: Publish with dotnet
-      run: dotnet publish ./DndBoard/Server --configuration Release
+      run: dotnet publish ./Src/DndBoard/WasmServer --configuration Release
      
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
       with:
         name: my-artifact
-        path: ./DndBoard/Server/bin/Release/net5.0/publish
+        path: ./Src/DndBoard/WasmServer/bin/Release/net5.0/publish
 
   deploy:
     needs: [build-and-test, publish]
@@ -85,7 +85,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: my-artifact
-        path: ./DndBoard/Server/bin/Release/net5.0/publish
+        path: ./Src/DndBoard/WasmServer/bin/Release/net5.0/publish
 
     - name: Take application offline
       shell: cmd
