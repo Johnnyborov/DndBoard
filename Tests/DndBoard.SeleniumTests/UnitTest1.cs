@@ -42,7 +42,7 @@ namespace DndBoard.SeleniumTests
         [Fact]
         public void Test1()
         {
-            _driver.Navigate().GoToUrl("https://127.0.0.1:44337/board");
+            _driver.Navigate().GoToUrl("https://localhost:5001/board");
             ConnectToBoard();
             UploadIcon();
             AddIconToMap();

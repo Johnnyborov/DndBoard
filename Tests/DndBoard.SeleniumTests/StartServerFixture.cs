@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net.Sockets;
 using System.Threading;
 using Xunit;
 
@@ -47,10 +48,42 @@ namespace DndBoard.SeleniumTests
             _process.StartInfo.UseShellExecute = false;
             _process.StartInfo.Arguments = "run . -c Release";
             _process.Start();
-            Thread.Sleep(12500);
+            WaitUntilServerStarted();
         }
 
-        public void StopServer()
+        private void WaitUntilServerStarted()
+        {
+            int timeoutSec = 30000;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (!ServerStarted())
+            {
+                if (sw.ElapsedMilliseconds > timeoutSec * 1000)
+                    throw new TimeoutException($"Server failed to start in {timeoutSec} seconds.");
+                Thread.Sleep(1000);
+            }
+        }
+
+        private bool ServerStarted() =>
+            IsPortOpen("localhost", 5001, TimeSpan.FromMilliseconds(500));
+
+        private bool IsPortOpen(string host, int port, TimeSpan timeout)
+        {
+            try
+            {
+                using TcpClient client = new TcpClient();
+                IAsyncResult result = client.BeginConnect(host, port, null, null);
+                bool success = result.AsyncWaitHandle.WaitOne(timeout);
+                client.EndConnect(result);
+                return success;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void StopServer()
         {
             _process.Kill();
         }

@@ -60,10 +60,12 @@ jobs:
     - name: Download ChromeDriver
       shell: pwsh
       run: |
-        $ChromeVersion = (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(Default)').VersionInfo
-        Write-Output $ChromeVersion
+        $ChromeVersionInfo = (Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(Default)').VersionInfo
+        Write-Output $ChromeVersionInfo
+        $ChromeVersion = $ChromeVersionInfo.ProductVersion
+        $ChromeDriverUrl = "https://chromedriver.storage.googleapis.com/" + $ChromeVersion + "/chromedriver_win32.zip"
         cd ./Tests/DndBoard.SeleniumTests/bin/Release/netcoreapp3.1;
-        Invoke-WebRequest -Uri "https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_win32.zip" -OutFile ./chromedriver_win32.zip;
+        Invoke-WebRequest -Uri $ChromeDriverUrl -OutFile ./chromedriver_win32.zip;
         Expand-Archive ./chromedriver_win32.zip -DestinationPath ./chromedriver_win32;
         Copy-Item ./chromedriver_win32/chromedriver.exe -Destination .;
       
