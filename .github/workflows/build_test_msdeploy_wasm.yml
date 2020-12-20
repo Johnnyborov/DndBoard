@@ -1,4 +1,4 @@
-name: Dotnet Build-Test-MSDeploy
+name: Dotnet Build-Test-MSDeploy Wasm
 
 on:
   push:

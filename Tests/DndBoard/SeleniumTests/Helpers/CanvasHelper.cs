@@ -20,7 +20,7 @@ namespace DndBoard.SeleniumTests.Helpers
         {
             _driver.ExecuteScript("window.scrollTo(0, arguments[0].getBoundingClientRect().top)", mapCanvas);
             int offsetY = (int)(dynamic)_driver.ExecuteScript("return arguments[0].getBoundingClientRect().top;", mapCanvas);
-            
+
             Actions actions = new Actions(_driver);
             actions.MoveToElement(mapCanvas, 1, 1 + offsetY).Perform();
             return actions;

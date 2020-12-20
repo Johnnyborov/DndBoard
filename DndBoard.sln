@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{5C5600
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GithubWorkflows", "GithubWorkflows", "{E41D3E6F-481C-421F-8078-77B22DBF13FC}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\build_test_msdeploy.yml = .github\workflows\build_test_msdeploy.yml
+		.github\workflows\build_test_msdeploy_wasm.yml = .github\workflows\build_test_msdeploy_wasm.yml
 		.github\workflows\ftpdeploy.yml.disabled = .github\workflows\ftpdeploy.yml.disabled
 	EndProjectSection
 EndProject
