@@ -2,7 +2,7 @@ name: Dotnet Build-Test-MSDeploy
 
 on:
   push:
-    branches: [ selenium ]
+    branches: [ master ]
 
 env:
   PUBLISH_DIR_REL: DndBoard\Server\bin\Release\net5.0\publish\
