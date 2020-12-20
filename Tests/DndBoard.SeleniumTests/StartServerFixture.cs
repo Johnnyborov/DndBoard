@@ -47,7 +47,7 @@ namespace DndBoard.SeleniumTests
             _process.StartInfo.UseShellExecute = false;
             _process.StartInfo.Arguments = "run . -c Release";
             _process.Start();
-            Thread.Sleep(2500);
+            Thread.Sleep(12500);
         }
 
         public void StopServer()
