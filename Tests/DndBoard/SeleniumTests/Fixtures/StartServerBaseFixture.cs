@@ -2,22 +2,23 @@
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
-using Xunit;
 
-namespace DndBoard.SeleniumTests
+namespace DndBoard.SeleniumTests.Fixtures
 {
-    [CollectionDefinition(nameof(StartServerCollection))]
-    public class StartServerCollection : ICollectionFixture<StartServerFixture> { }
-
-
-    public class StartServerFixture : IDisposable
+    public abstract class StartServerBaseFixture : IDisposable
     {
         private const string DotnetCmdName = "dotnet";
-        private const string ServerProjDir = "../../../../../../Src/DndBoard/WasmServer";
+        private const int PortCheckTimoutMilliseconds = 500;
+        private const int PortCheckWaitNextTryMilliseconds = 1000;
         private Process _process;
 
+        protected abstract string ServerProjDir { get; }
+        protected abstract int StartTimeoutSec { get; }
+        protected abstract string Host { get; }
+        protected abstract int Port { get; }
 
-        public StartServerFixture()
+
+        public StartServerBaseFixture()
         {
             BuildServer();
             StartServer();
@@ -29,43 +30,43 @@ namespace DndBoard.SeleniumTests
         }
 
 
-        private static void BuildServer()
+        private void BuildServer()
         {
             Process buildProcess = new Process();
-            buildProcess.StartInfo.WorkingDirectory = ServerProjDir;
-            buildProcess.StartInfo.FileName = DotnetCmdName;
-            buildProcess.StartInfo.UseShellExecute = false;
-            buildProcess.StartInfo.Arguments = "build . -c Release";
-            buildProcess.Start();
+            StartProcess(buildProcess, "build . -c Release");
             buildProcess.Kill();
         }
 
         private void StartServer()
         {
             _process = new Process();
-            _process.StartInfo.WorkingDirectory = ServerProjDir;
-            _process.StartInfo.FileName = DotnetCmdName;
-            _process.StartInfo.UseShellExecute = false;
-            _process.StartInfo.Arguments = "run . -c Release";
-            _process.Start();
+            StartProcess(_process, "run . -c Release");
             WaitUntilServerStarted();
+        }
+
+        private void StartProcess(Process buildProcess, string args)
+        {
+            buildProcess.StartInfo.WorkingDirectory = ServerProjDir;
+            buildProcess.StartInfo.FileName = DotnetCmdName;
+            buildProcess.StartInfo.UseShellExecute = false;
+            buildProcess.StartInfo.Arguments = args;
+            buildProcess.Start();
         }
 
         private void WaitUntilServerStarted()
         {
-            int timeoutSec = 30000;
             Stopwatch sw = new Stopwatch();
             sw.Start();
             while (!ServerStarted())
             {
-                if (sw.ElapsedMilliseconds > timeoutSec * 1000)
-                    throw new TimeoutException($"Server failed to start in {timeoutSec} seconds.");
-                Thread.Sleep(1000);
+                if (sw.ElapsedMilliseconds > StartTimeoutSec * 1000)
+                    throw new TimeoutException($"Server failed to start in {StartTimeoutSec} seconds.");
+                Thread.Sleep(PortCheckWaitNextTryMilliseconds);
             }
         }
 
         private bool ServerStarted() =>
-            IsPortOpen("localhost", 5001, TimeSpan.FromMilliseconds(500));
+            IsPortOpen(Host, Port, TimeSpan.FromMilliseconds(PortCheckTimoutMilliseconds));
 
         private bool IsPortOpen(string host, int port, TimeSpan timeout)
         {

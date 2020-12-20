@@ -11,15 +11,16 @@ using static DndBoard.SeleniumTests.Helpers.PixelHelper;
 
 namespace DndBoard.SeleniumTests
 {
-    [Collection(nameof(StartServerCollection))]
-    public class UnitTest1 : IDisposable
+    public abstract class BaseTests : IDisposable
     {
         private readonly string _dataDir;
         private readonly ChromeDriver _driver;
         private readonly CanvasHelper _canvasHelper;
 
+        protected abstract string SiteBaseAddress { get; }
 
-        public UnitTest1()
+
+        public BaseTests()
         {
             string currentDir = Directory.GetCurrentDirectory();
             _dataDir = Path.GetFullPath(Path.Combine(currentDir, "../../../../../TestData"));
@@ -40,9 +41,9 @@ namespace DndBoard.SeleniumTests
 
 
         [Fact]
-        public void Test1()
+        public void UploadIcon_MoveIcon_Works()
         {
-            _driver.Navigate().GoToUrl("https://localhost:5001/board");
+            _driver.Navigate().GoToUrl($"{SiteBaseAddress}/board");
             ConnectToBoard();
             UploadIcon();
             AddIconToMap();
