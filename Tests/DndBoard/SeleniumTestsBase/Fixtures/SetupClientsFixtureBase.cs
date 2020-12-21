@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using DndBoard.SeleniumTests.Helpers;
+using DndBoard.SeleniumTestsBase.Helpers;
 using OpenQA.Selenium.Chrome;
 
-namespace DndBoard.SeleniumTests.Fixtures
+namespace DndBoard.SeleniumTestsBase.Fixtures
 {
     public abstract class SetupClientsFixtureBase : IDisposable
     {

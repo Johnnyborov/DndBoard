@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using DndBoard.SeleniumTestsBase.Fixtures;
+using Xunit;
 
-namespace DndBoard.SeleniumTests.Fixtures
+namespace DndBoard.SeleniumTestsWasm.Fixtures
 {
     [CollectionDefinition(nameof(SetupClientsCollectionWasm))]
     public sealed class SetupClientsCollectionWasm : ICollectionFixture<SetupClientsFixtureWasm> { }

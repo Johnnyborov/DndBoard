@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DndBoard.SeleniumTests.Helpers
+namespace DndBoard.SeleniumTestsBase.Helpers
 {
     public static class PixelHelper
     {

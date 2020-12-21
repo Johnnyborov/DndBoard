@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace DndBoard.SeleniumTests.Fixtures
+namespace DndBoard.SeleniumTestsBase.Fixtures
 {
     public abstract class StartServerFixtureBase : IDisposable
     {

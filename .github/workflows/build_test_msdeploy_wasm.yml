@@ -33,7 +33,7 @@ jobs:
       run: dotnet build ./Src/DndBoard/WasmServer -c Release
 
     - name: Build selenium tests
-      run: dotnet build ./Tests/DndBoard/SeleniumTests -c Release
+      run: dotnet build ./Tests/DndBoard/SeleniumTestsWasm -c Release
 
     - name: Download ChromeDriver
       shell: pwsh
@@ -42,13 +42,13 @@ jobs:
         Write-Output $ChromeVersionInfo
         $ChromeVersion = $ChromeVersionInfo.ProductVersion
         $ChromeDriverUrl = "https://chromedriver.storage.googleapis.com/" + $ChromeVersion + "/chromedriver_win32.zip"
-        cd ./Tests/DndBoard/SeleniumTests/bin/Release/netcoreapp3.1;
+        cd ./Tests/DndBoard/SeleniumTestsWasm/bin/Release/netcoreapp3.1;
         Invoke-WebRequest -Uri $ChromeDriverUrl -OutFile ./chromedriver_win32.zip;
         Expand-Archive ./chromedriver_win32.zip -DestinationPath ./chromedriver_win32;
         Copy-Item ./chromedriver_win32/chromedriver.exe -Destination .;
       
     - name: Run selenium tests (which build and run server)
-      run: dotnet test ./Tests/DndBoard/SeleniumTests -c Release
+      run: dotnet test ./Tests/DndBoard/SeleniumTestsWasm -c Release
 
   publish:
     needs: build-and-test

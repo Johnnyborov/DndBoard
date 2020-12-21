@@ -5,9 +5,9 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
 using Xunit;
-using static DndBoard.SeleniumTests.Helpers.PixelHelper;
+using static DndBoard.SeleniumTestsBase.Helpers.PixelHelper;
 
-namespace DndBoard.SeleniumTests.Helpers
+namespace DndBoard.SeleniumTestsBase.Helpers
 {
     public class ClientHelper
     {

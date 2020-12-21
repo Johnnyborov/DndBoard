@@ -4,7 +4,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
 
-namespace DndBoard.SeleniumTests.Helpers
+namespace DndBoard.SeleniumTestsBase.Helpers
 {
     public class CanvasHelper
     {

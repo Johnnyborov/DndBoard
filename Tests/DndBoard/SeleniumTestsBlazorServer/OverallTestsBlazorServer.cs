@@ -1,7 +1,8 @@
-using DndBoard.SeleniumTests.Fixtures;
+using DndBoard.SeleniumTestsBase;
+using DndBoard.SeleniumTestsBlazorServer.Fixtures;
 using Xunit;
 
-namespace DndBoard.SeleniumTests
+namespace DndBoard.SeleniumTestsBlazorServer
 {
     [Collection(nameof(StartServerCollectionBlazorServer))]
     public sealed class OverallTestsBlazorServer : OverallTestsBase, IClassFixture<SetupClientsFixtureBlazorServer>

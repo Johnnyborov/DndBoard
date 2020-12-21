@@ -1,9 +1,9 @@
 using System.Threading;
-using DndBoard.SeleniumTests.Fixtures;
-using DndBoard.SeleniumTests.Helpers;
+using DndBoard.SeleniumTestsBase.Fixtures;
+using DndBoard.SeleniumTestsBase.Helpers;
 using Xunit;
 
-namespace DndBoard.SeleniumTests
+namespace DndBoard.SeleniumTestsBase
 {
     public abstract class OverallTestsBase
     {
