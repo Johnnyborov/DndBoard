@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace DndBoard.WasmServer.Hubs
+namespace DndBoard.ServerCommon.Hubs
 {
     public class BoardsManager
     {

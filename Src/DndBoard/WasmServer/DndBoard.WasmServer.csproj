@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ServerCommon\DndBoard.ServerCommon.csproj" />
     <ProjectReference Include="..\WasmClient\DndBoard.WasmClient.csproj" />
   </ItemGroup>
 

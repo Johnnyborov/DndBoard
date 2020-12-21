@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using DndBoard.BlazorServer.Hubs;
+using DndBoard.ServerCommon.Hubs;
 using DndBoard.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
-namespace DndBoard.BlazorServer.Controllers
+namespace DndBoard.ServerCommon.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]

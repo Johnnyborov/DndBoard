@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DndBoard.Shared;
 
-namespace DndBoard.WasmServer.Hubs
+namespace DndBoard.ServerCommon.Hubs
 {
     public class Board
     {

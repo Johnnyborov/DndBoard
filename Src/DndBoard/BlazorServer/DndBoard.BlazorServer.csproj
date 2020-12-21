@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ClientCommon\DndBoard.ClientCommon.csproj" />
+    <ProjectReference Include="..\ServerCommon\DndBoard.ServerCommon.csproj" />
   </ItemGroup>
 
 </Project>

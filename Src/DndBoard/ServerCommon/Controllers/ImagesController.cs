@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using DndBoard.WasmServer.Hubs;
+using DndBoard.ServerCommon.Hubs;
 
-namespace DndBoard.WasmServer.Controllers
+namespace DndBoard.ServerCommon.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]

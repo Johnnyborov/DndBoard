@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using DndBoard.Shared;
 using Microsoft.AspNetCore.SignalR;
 
-namespace DndBoard.WasmServer.Hubs
+namespace DndBoard.ServerCommon.Hubs
 {
     public class BoardsHub : Hub
     {
