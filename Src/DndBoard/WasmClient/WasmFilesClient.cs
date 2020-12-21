@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using DndBoard.Shared;
+using DndBoard.Shared.Models;
 using DndBoard.ClientCommon;
 
 namespace DndBoard.WasmClient
@@ -30,7 +30,7 @@ namespace DndBoard.WasmClient
             );
         }
 
-        public async Task<List<string>> GetFilesListAsJsonAsync(string boardId)
+        public async Task<List<string>> GetIconsModelsListAsJsonAsync(string boardId)
         {
             return await _httpClient.GetFromJsonAsync<List<string>>(
                 $"/api/images/getfilesids/{boardId}"

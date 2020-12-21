@@ -1,8 +1,8 @@
-﻿namespace DndBoard.Shared
+﻿namespace DndBoard.Shared.Models
 {
     public record CoordsChangeData
     {
-        public string ImageId { get; set; }
+        public string InstanceId { get; set; }
         public Coords Coords { get; set; }
         public string ModelId { get; set; }
     }

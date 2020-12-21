@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DndBoard.ClientCommon;
 using DndBoard.ServerCommon.Controllers;
-using DndBoard.Shared;
+using DndBoard.Shared.Models;
 
 namespace DndBoard.BlazorServer
 {
@@ -31,7 +31,7 @@ namespace DndBoard.BlazorServer
             await _fileUploadController.DeleteFile(boardId, fileId);
         }
 
-        public async Task<List<string>> GetFilesListAsJsonAsync(string boardId)
+        public async Task<List<string>> GetIconsModelsListAsJsonAsync(string boardId)
         {
             return (await _imagesController.GetFilesIds(boardId)).ToList();
         }

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Blazor.Extensions;
-using DndBoard.Shared;
+using DndBoard.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;

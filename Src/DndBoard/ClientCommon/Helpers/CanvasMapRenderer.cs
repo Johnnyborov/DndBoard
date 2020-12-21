@@ -14,9 +14,9 @@ namespace DndBoard.ClientCommon.Helpers
     {
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
-        public async Task RedrawImagesByCoords(
+        public async Task RedrawIconsByCoords(
             BECanvasComponent canvas,
-            List<MapImage> images)
+            List<DndIconElem> icons)
         {
             await _semaphore.WaitAsync();
             try
@@ -26,9 +26,9 @@ namespace DndBoard.ClientCommon.Helpers
                 await context.SetFillStyleAsync("Red");
                 await context.FillRectAsync(0, 0, canvas.Width, canvas.Height);
 
-                foreach (MapImage img in images)
+                foreach (DndIconElem icon in icons)
                 {
-                    await context.DrawImageAsync(img.Ref, img.Coords.X, img.Coords.Y);
+                    await context.DrawImageAsync(icon.Ref, icon.Coords.X, icon.Coords.Y);
                 }
             }
             finally
@@ -37,16 +37,16 @@ namespace DndBoard.ClientCommon.Helpers
             }
         }
 
-        public async Task RedrawImagesByCoordsJS(
+        public async Task RedrawIconsByCoordsJS(
             IJSRuntime jsRuntime,
-            List<MapImage> images)
+            List<DndIconElem> icons)
         {
             await _semaphore.WaitAsync();
             try
             {
                 List<object> imgList = new();
-                foreach (MapImage img in images)
-                    imgList.Add(new { img.Ref, img.Coords.X, img.Coords.Y });
+                foreach (DndIconElem icon in icons)
+                    imgList.Add(new { icon.Ref, icon.Coords.X, icon.Coords.Y });
 
                 await jsRuntime.InvokeAsync<object>(
                     "redrawAllImages",

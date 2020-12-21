@@ -7,17 +7,17 @@ function getElementOffsets(el) {
     return JSON.stringify(obj);
 }
 
-var mapComponentInstance;
-function initMapComponent(instance) {
-    mapComponentInstance = instance;
+var iconsInstancesComponentInstance;
+function initIconsInstancesComponent(instance) {
+    iconsInstancesComponentInstance = instance;
     window.requestAnimationFrame(redraw);
 }
 function redraw() {
-    mapComponentInstance.invokeMethodAsync('Redraw');
+    iconsInstancesComponentInstance.invokeMethodAsync('Redraw');
     window.requestAnimationFrame(redraw);
 }
 function clearMapCanvas() {
-    var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];
+    var mapCanvas = document.getElementById('IconsInstancesCanvasDiv').getElementsByTagName('canvas')[0];
     var canvasW = mapCanvas.getBoundingClientRect().width;
     var canvasH = mapCanvas.getBoundingClientRect().height;
 
@@ -27,7 +27,7 @@ function clearMapCanvas() {
     ctx.fillRect(0, 0, canvasW, canvasH);
 }
 function redrawImage(img, x, y) {
-    var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];;
+    var mapCanvas = document.getElementById('IconsInstancesCanvasDiv').getElementsByTagName('canvas')[0];;
     var ctx = mapCanvas.getContext('2d');
     ctx.drawImage(img, x, y);
 }

@@ -4,16 +4,16 @@ using DndBoard.ClientCommon.BaseComponents;
 using DndBoard.ClientCommon.Helpers;
 using DndBoard.ClientCommon.Models;
 using DndBoard.ClientCommon.Store;
-using DndBoard.Shared;
+using DndBoard.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace DndBoard.ClientCommon.Components
 {
-    public partial class MapComponent : CanvasBaseComponent
+    public partial class IconsInstancesComponent : CanvasBaseComponent
     {
-        private MapImage _clickedImage;
+        private DndIconElem _clickedIcon;
         [Inject]
         private AppState _appState { get; set; }
         [Inject]
@@ -30,17 +30,17 @@ namespace DndBoard.ClientCommon.Components
                 _initialized = true;
 
             _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
-            _appState.ChatHubManager.SetImageRemovedHandler(ImageRemovedHandler);
+            _appState.ChatHubManager.SetIconInstanceRemovedHandler(IconInstanceRemovedHandler);
 
             await _jsRuntime.InvokeAsync<object>(
-                "initMapComponent", DotNetObjectReference.Create(this)
+                "initIconsInstancesComponent", DotNetObjectReference.Create(this)
             );
         }
 
         
-        private void ImageRemovedHandler(string imageId)
+        private void IconInstanceRemovedHandler(string iconInstanceId)
         {
-            _appState.MapImages.RemoveAll(img => img.Id == imageId);
+            _appState.IconsInstances.RemoveAll(icon => icon.InstanceId == iconInstanceId);
         }
 
         private void CoordsReceivedHandler(string coordsChangeDataJson)
@@ -48,21 +48,21 @@ namespace DndBoard.ClientCommon.Components
             CoordsChangeData coordsChangeData = JsonSerializer
                 .Deserialize<CoordsChangeData>(coordsChangeDataJson);
 
-            if (!_appState.MapImages.Exists(img => img.Id == coordsChangeData.ImageId)
-                && _appState.ModelImages.Exists(x => x.Id == coordsChangeData.ModelId))
+            if (!_appState.IconsInstances.Exists(img => img.InstanceId == coordsChangeData.InstanceId)
+                && _appState.IconsModels.Exists(x => x.ModelId == coordsChangeData.ModelId))
             {
-                _appState.MapImages.Add(new MapImage
+                _appState.IconsInstances.Add(new DndIconElem
                 {
-                    Id = coordsChangeData.ImageId,
+                    InstanceId = coordsChangeData.InstanceId,
                     Coords = coordsChangeData.Coords,
                     ModelId = coordsChangeData.ModelId,
-                    Ref = _appState.ModelImages.Find(x => x.Id == coordsChangeData.ModelId).Ref,
+                    Ref = _appState.IconsModels.Find(x => x.ModelId == coordsChangeData.ModelId).Ref,
                 });
             }
 
-            if (_appState.MapImages.Exists(img => img.Id == coordsChangeData.ImageId))
+            if (_appState.IconsInstances.Exists(img => img.InstanceId == coordsChangeData.InstanceId))
             {
-                _appState.MapImages.Find(img => img.Id == coordsChangeData.ImageId)
+                _appState.IconsInstances.Find(img => img.InstanceId == coordsChangeData.InstanceId)
                     .Coords = coordsChangeData.Coords;
             }
         }
@@ -70,42 +70,42 @@ namespace DndBoard.ClientCommon.Components
         [JSInvokable]
         public async Task Redraw()
         {
-            if (_appState.MapImages is null)
+            if (_appState.IconsInstances is null)
                 return;
 
-            await _canvasMapRenderer.RedrawImagesByCoordsJS(_jsRuntime, _appState.MapImages);
+            await _canvasMapRenderer.RedrawIconsByCoordsJS(_jsRuntime, _appState.IconsInstances);
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
         {
-            MapImage mapImage = _clickedImage;
-            if (mapImage is not null)
+            DndIconElem clickedIcon = _clickedIcon;
+            if (clickedIcon is not null)
             {
                 Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
 
-                mapImage.Coords = coords;
+                clickedIcon.Coords = coords;
 
                 CoordsChangeData coordsChangeData = new CoordsChangeData
                 {
-                    ImageId = mapImage.Id,
+                    InstanceId = clickedIcon.InstanceId,
                     Coords = coords,
-                    ModelId = mapImage.ModelId,
+                    ModelId = clickedIcon.ModelId,
                 };
                 string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
                 await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
             }
         }
 
-        private async Task<MapImage> GetClickedImage(MouseEventArgs mouseEventArgs)
+        private async Task<DndIconElem> GetClickedIcon(MouseEventArgs mouseEventArgs)
         {
             Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
 
-            foreach (MapImage img in _appState.MapImages)
+            foreach (DndIconElem icon in _appState.IconsInstances)
             {
-                if (coords.X >= img.Coords.X && coords.X <= img.Coords.X + 100
-                    && coords.Y >= img.Coords.Y && coords.Y <= img.Coords.Y + 100)
+                if (coords.X >= icon.Coords.X && coords.X <= icon.Coords.X + 100
+                    && coords.Y >= icon.Coords.Y && coords.Y <= icon.Coords.Y + 100)
                 {
-                    return img;
+                    return icon;
                 }
             }
 
@@ -113,17 +113,17 @@ namespace DndBoard.ClientCommon.Components
         }
 
         private async Task OnMouseDown(MouseEventArgs mouseEventArgs) =>
-            _clickedImage = await GetClickedImage(mouseEventArgs);
+            _clickedIcon = await GetClickedIcon(mouseEventArgs);
         private void OnMouseUp(MouseEventArgs mouseEventArgs) =>
-            _clickedImage = null;
+            _clickedIcon = null;
         private void OnMouseOut(MouseEventArgs mouseEventArgs) =>
-            _clickedImage = null;
+            _clickedIcon = null;
 
         private async Task OnRightClick(MouseEventArgs mouseEventArgs)
         {
-            MapImage clickedImage = await GetClickedImage(mouseEventArgs);
+            DndIconElem clickedImage = await GetClickedIcon(mouseEventArgs);
             if (clickedImage is not null)
-                await _appState.ChatHubManager.SendImageRemoved(clickedImage.Id);
+                await _appState.ChatHubManager.SendIconInstanceRemoved(clickedImage.InstanceId);
         }
     }
 }

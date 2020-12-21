@@ -8,14 +8,14 @@ using DndBoard.ClientCommon.BaseComponents;
 using DndBoard.ClientCommon.Helpers;
 using DndBoard.ClientCommon.Models;
 using DndBoard.ClientCommon.Store;
-using DndBoard.Shared;
+using DndBoard.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace DndBoard.ClientCommon.Components
 {
-    public partial class ImagesComponent : CanvasBaseComponent
+    public partial class IconsModelsComponent : CanvasBaseComponent
     {
         private string _boardId;
 
@@ -73,39 +73,39 @@ namespace DndBoard.ClientCommon.Components
         private async Task OnRightClick(MouseEventArgs mouseEventArgs)
         {
             Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
-            MapImage clickedImage = GetClickedImage(coords);
-            if (clickedImage is null)
+            DndIconElem clickedIcon = GetClickedIcon(coords);
+            if (clickedIcon is null)
                 return;
 
-            await _Client.DeleteFilesAsync(_boardId, clickedImage.Id);
+            await _Client.DeleteFilesAsync(_boardId, clickedIcon.InstanceId);
         }
 
         private async Task OnClick(MouseEventArgs mouseEventArgs)
         {
             Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
-            MapImage clickedImage = GetClickedImage(coords);
-            if (clickedImage is null)
+            DndIconElem clickedIcon = GetClickedIcon(coords);
+            if (clickedIcon is null)
                 return;
  
             CoordsChangeData coordsChangeData = new CoordsChangeData
             {
-                ImageId = Guid.NewGuid().ToString(),
+                InstanceId = Guid.NewGuid().ToString(),
                 Coords = new Coords { X = 10, Y = 10 },
-                ModelId = clickedImage.Id,
+                ModelId = clickedIcon.ModelId,
             };
             string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
             await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
             await _appState.InvokeFilesRefsChanged();
         }
 
-        private MapImage GetClickedImage(Coords coords)
+        private DndIconElem GetClickedIcon(Coords coords)
         {
-            foreach (MapImage img in _appState.ModelImages)
+            foreach (DndIconElem icon in _appState.IconsModels)
             {
-                if (coords.X >= img.Coords.X && coords.X <= img.Coords.X + 100
-                    && coords.Y >= img.Coords.Y && coords.Y <= img.Coords.Y + 100)
+                if (coords.X >= icon.Coords.X && coords.X <= icon.Coords.X + 100
+                    && coords.Y >= icon.Coords.Y && coords.Y <= icon.Coords.Y + 100)
                 {
-                    return img;
+                    return icon;
                 }
             }
 
@@ -115,15 +115,15 @@ namespace DndBoard.ClientCommon.Components
         protected override void OnInitialized()
         {
             _appState.BoardIdChanged += OnBoardIdChanged;
-            _appState.ChatHubManager.SetNofifyFilesUpdateHandler(OnFilesUpdated);
+            _appState.ChatHubManager.SetNofifyIconsModelsUpdateHandler(OnIconsModelsUpdated);
         }
 
-        private void OnFilesUpdated(string boardId)
+        private void OnIconsModelsUpdated(string boardId)
         {
-            _ = RefreshFilesAsync();
-            async Task RefreshFilesAsync()
+            _ = RefreshIconsModelsAsync();
+            async Task RefreshIconsModelsAsync()
             {
-                await ReloadFiles();
+                await ReloadIconsModels();
                 await Redraw();
                 await _appState.ChatHubManager.RequestAllCoords();
             }
@@ -131,26 +131,26 @@ namespace DndBoard.ClientCommon.Components
 
         private async Task Redraw()
         {
-            await _canvasMapRenderer.RedrawImagesByCoords(Canvas, _appState.ModelImages);
+            await _canvasMapRenderer.RedrawIconsByCoords(Canvas, _appState.IconsModels);
         }
 
         private async Task OnBoardIdChanged(string boardId)
         {
             _boardId = boardId;
-            OnFilesUpdated(_boardId);
+            OnIconsModelsUpdated(_boardId);
         }
 
-        private async Task ReloadFiles()
+        private async Task ReloadIconsModels()
         {
-            List<string> fileIds = await _Client.GetFilesListAsJsonAsync(_boardId);
+            List<string> modelsIds = await _Client.GetIconsModelsListAsJsonAsync(_boardId);
 
-            _appState.MapImages = new(); // Old image refs become invalid, so recreate.
-            _appState.ModelImages = new(); // Otherwise existing refs don't get updated.
+            _appState.IconsInstances = new(); // Old image refs become invalid, so recreate.
+            _appState.IconsModels = new(); // Otherwise existing refs don't get updated.
             StateHasChanged();
 
-            _appState.ModelImages = fileIds.Select(id => new MapImage { Id = id }).ToList();
-            for (int i = 0; i < _appState.ModelImages.Count; i++)
-                _appState.ModelImages[i].Coords = new Coords { X = 50, Y = 50 + i * 110 };
+            _appState.IconsModels = modelsIds.Select(id => new DndIconElem { ModelId = id }).ToList();
+            for (int i = 0; i < _appState.IconsModels.Count; i++)
+                _appState.IconsModels[i].Coords = new Coords { X = 50, Y = 50 + i * 110 };
 
             StateHasChanged();
             await Task.Delay(300); // Wait for images to get downloaded. Use loaded event?

@@ -33,6 +33,7 @@ namespace DndBoard.BlazorServer
             services.AddTransient<BoardsManager>();
             services.AddSignalR();
             services.AddControllersWithViews().AddControllersAsServices();
+
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddResponseCompression(opts =>

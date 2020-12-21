@@ -8,8 +8,8 @@ namespace DndBoard.ClientCommon.Store
     public class AppState
     {
         public ChatHubManager ChatHubManager;
-        public List<MapImage> MapImages;
-        public List<MapImage> ModelImages;
+        public List<DndIconElem> IconsInstances;
+        public List<DndIconElem> IconsModels;
 
         public event FilesRefsChangedHandler FilesRefsChanged;
         public event BoardIdChangedHandler BoardIdChanged;

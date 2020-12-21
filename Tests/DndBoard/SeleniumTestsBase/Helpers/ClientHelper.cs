@@ -53,8 +53,8 @@ namespace DndBoard.SeleniumTestsBase.Helpers
 
         public void AddIconToMap(int clickToX, int clickToY)
         {
-            IWebElement imgCanvas = _driver.FindElementByCssSelector("#ImagesDivCanvas > canvas");
-            Actions actions = _canvasHelper.MoveToElemLeftTopCorner(imgCanvas);
+            IWebElement iconsModelsCanvas = _driver.FindElementByCssSelector("#IconsModelsDivCanvas > canvas");
+            Actions actions = _canvasHelper.MoveToElemLeftTopCorner(iconsModelsCanvas);
             actions.MoveByOffset(clickToX, clickToY).Perform();
             actions.Click().Perform();
             Thread.Sleep(500);
@@ -62,9 +62,9 @@ namespace DndBoard.SeleniumTestsBase.Helpers
 
         public void MoveIcon(int nowX, int nowY, int moveX, int moveY)
         {
-            IWebElement mapCanvas = _driver.FindElementByCssSelector("#MapCanvasDiv > canvas");
+            IWebElement iconsInstancesCanvas = _driver.FindElementByCssSelector("#IconsInstancesCanvasDiv > canvas");
 
-            Actions actions = _canvasHelper.MoveToElemLeftTopCorner(mapCanvas);
+            Actions actions = _canvasHelper.MoveToElemLeftTopCorner(iconsInstancesCanvas);
 
             actions.MoveByOffset(nowX, nowY).Perform();
             actions.ClickAndHold().Perform();

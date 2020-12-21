@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using DndBoard.ServerCommon.Hubs;
 using DndBoard.Shared;
+using DndBoard.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -30,7 +31,7 @@ namespace DndBoard.ServerCommon.Controllers
             board.DeleteFile(fileId);
 
             await _boardsHubContext.Clients.Group(boardId)
-                .SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
+                .SendAsync(BoardsHubContract.NotifyIconsModelsUpdate, boardId);
 
             return Ok();
         }
@@ -45,7 +46,7 @@ namespace DndBoard.ServerCommon.Controllers
                 board.AddFile(file.FileContent);
 
             await _boardsHubContext.Clients.Group(boardId)
-                .SendAsync(BoardsHubContract.NotifyFilesUpdate, boardId);
+                .SendAsync(BoardsHubContract.NotifyIconsModelsUpdate, boardId);
         }
     }
 }

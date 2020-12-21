@@ -6,8 +6,8 @@ Board ID:
 <input @bind="_boardId" id="boardId" />
 <button @onclick="ConnectAsync" class="btn-primary">Connect</button>
 
-<MapComponent></MapComponent>
+<IconsInstancesComponent></IconsInstancesComponent>
 @if (_connectedBoardId != null)
 {
-    <ImagesComponent></ImagesComponent>
+    <IconsModelsComponent></IconsModelsComponent>
 }

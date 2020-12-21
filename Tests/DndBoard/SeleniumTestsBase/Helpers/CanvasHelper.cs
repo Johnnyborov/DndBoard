@@ -29,7 +29,7 @@ namespace DndBoard.SeleniumTestsBase.Helpers
         public Dictionary<string, int> GetPixel(int x, int y)
         {
             string script = @"
-var mapCanvas = document.getElementById('MapCanvasDiv').getElementsByTagName('canvas')[0];
+var mapCanvas = document.getElementById('IconsInstancesCanvasDiv').getElementsByTagName('canvas')[0];
 var ctx = mapCanvas.getContext('2d');
 var pixelData = ctx.getImageData(arguments[0], arguments[1], 1, 1).data;
 return JSON.stringify(pixelData);

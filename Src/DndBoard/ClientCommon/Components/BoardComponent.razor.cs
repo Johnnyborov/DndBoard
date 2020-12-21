@@ -40,8 +40,8 @@ namespace DndBoard.ClientCommon.Components
 
         private void ConnectedHanlder(string boardId)
         {
-            _appState.MapImages = new List<MapImage>();
-            _appState.ModelImages = new List<MapImage>();
+            _appState.IconsInstances = new List<DndIconElem>();
+            _appState.IconsModels = new List<DndIconElem>();
             _connectedBoardId = boardId;
             StateHasChanged();
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed

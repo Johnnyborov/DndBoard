@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using DndBoard.Shared;
+using DndBoard.Shared.Models;
 
 namespace DndBoard.ServerCommon.Hubs
 {
@@ -12,7 +12,7 @@ namespace DndBoard.ServerCommon.Hubs
             new ConcurrentDictionary<string, byte[]>();
 
         public string BoardId { get; set; }
-        public List<MyImage> ImagesOnMap { get; set; }
+        public List<DndIcon> IconsInstances { get; set; }
 
 
         public byte[] GetFile(string fileId)

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoard.Shared;
+using DndBoard.Shared.Models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DndBoard.ServerCommon.Hubs
@@ -15,25 +16,25 @@ namespace DndBoard.ServerCommon.Hubs
             _boardsManager = boardsManager;
         }
 
-        [HubMethodName(BoardsHubContract.ImageRemoved)]
-        public async Task SendImageRemoved(string boardId, string imageId)
+        [HubMethodName(BoardsHubContract.IconInstanceRemoved)]
+        public async Task SendIconInstanceRemoved(string boardId, string imageId)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            board.ImagesOnMap.RemoveAll(img => img.Id == imageId);
-            await Clients.Group(boardId).SendAsync(BoardsHubContract.ImageRemoved, imageId);
+            board.IconsInstances.RemoveAll(img => img.InstanceId == imageId);
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.IconInstanceRemoved, imageId);
         }
 
         [HubMethodName(BoardsHubContract.RequestAllCoords)]
         public async Task RequestAllCoords(string boardId)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            foreach (MyImage img in board.ImagesOnMap)
+            foreach (DndIcon icon in board.IconsInstances)
             {
                 CoordsChangeData coordsChangeData = new CoordsChangeData
                 {
-                    ImageId = img.Id,
-                    Coords = img.Coords,
-                    ModelId = img.ModelId,
+                    InstanceId = icon.InstanceId,
+                    Coords = icon.Coords,
+                    ModelId = icon.ModelId,
                 };
 
                 string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
@@ -48,15 +49,15 @@ namespace DndBoard.ServerCommon.Hubs
             CoordsChangeData coordsChangeData = JsonSerializer
                 .Deserialize<CoordsChangeData>(coordsChangeDataJson);
 
-            if (!board.ImagesOnMap.Exists(img => img.Id == coordsChangeData.ImageId))
-                board.ImagesOnMap.Add(new MyImage
+            if (!board.IconsInstances.Exists(icon => icon.InstanceId == coordsChangeData.InstanceId))
+                board.IconsInstances.Add(new DndIcon
                 {
-                    Id = coordsChangeData.ImageId,
+                    InstanceId = coordsChangeData.InstanceId,
                     Coords = coordsChangeData.Coords,
                     ModelId = coordsChangeData.ModelId,
                 });
             else
-                board.ImagesOnMap.Find(img => img.Id == coordsChangeData.ImageId)
+                board.IconsInstances.Find(icon => icon.InstanceId == coordsChangeData.InstanceId)
                     .Coords = coordsChangeData.Coords;
 
             await Clients.Group(boardId).SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
@@ -69,7 +70,7 @@ namespace DndBoard.ServerCommon.Hubs
                 _boardsManager.AddBoard(new Board
                 {
                     BoardId = boardId,
-                    ImagesOnMap = new List<MyImage>()
+                    IconsInstances = new List<DndIcon>()
                 });
 
             await Groups.AddToGroupAsync(Context.ConnectionId, boardId);

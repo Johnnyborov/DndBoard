@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DndBoard.Shared;
+using DndBoard.Shared.Models;
 
 namespace DndBoard.ClientCommon
 {
@@ -8,6 +8,6 @@ namespace DndBoard.ClientCommon
     {
         public Task PostFilesAsJsonAsync(UploadedFiles value);
         public Task DeleteFilesAsync(string boardId, string fileId);
-        Task<List<string>> GetFilesListAsJsonAsync(string boardId);
+        Task<List<string>> GetIconsModelsListAsJsonAsync(string boardId);
     }
 }

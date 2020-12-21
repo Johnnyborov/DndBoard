@@ -1,4 +1,4 @@
-﻿namespace DndBoard.Shared
+﻿namespace DndBoard.Shared.Models
 {
     public class UploadedFiles
     {
