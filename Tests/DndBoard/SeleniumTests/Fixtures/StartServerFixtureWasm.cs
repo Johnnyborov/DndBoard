@@ -2,11 +2,11 @@
 
 namespace DndBoard.SeleniumTests.Fixtures
 {
-    [CollectionDefinition(nameof(StartWasmServerCollection))]
-    public sealed class StartWasmServerCollection : ICollectionFixture<StartWasmServerFixturecs> { }
+    [CollectionDefinition(nameof(StartServerCollectionWasm))]
+    public sealed class StartServerCollectionWasm : ICollectionFixture<StartServerFixtureWasm> { }
 
 
-    public sealed class StartWasmServerFixturecs : StartServerBaseFixture
+    public sealed class StartServerFixtureWasm : StartServerFixtureBase
     {
         protected override string ServerProjDir => "../../../../../../Src/DndBoard/WasmServer";
         protected override int StartTimeoutSec => 30;

@@ -2,11 +2,11 @@
 
 namespace DndBoard.SeleniumTests.Fixtures
 {
-    [CollectionDefinition(nameof(StartBlazorServerCollection))]
-    public sealed class StartBlazorServerCollection : ICollectionFixture<StartBlazorServerFixture> { }
+    [CollectionDefinition(nameof(StartServerCollectionBlazorServer))]
+    public sealed class StartServerCollectionBlazorServer : ICollectionFixture<StartServerFixtureBlazorServer> { }
 
 
-    public sealed class StartBlazorServerFixture : StartServerBaseFixture
+    public sealed class StartServerFixtureBlazorServer : StartServerFixtureBase
     {
         protected override string ServerProjDir => "../../../../../../Src/DndBoard/BlazorServer";
         protected override int StartTimeoutSec => 30;

@@ -3,9 +3,10 @@ using Xunit;
 
 namespace DndBoard.SeleniumTests
 {
-    [Collection(nameof(StartWasmServerCollection))]
-    public sealed class OverallTestsWasm : OverallTestsBase
+    [Collection(nameof(StartServerCollectionWasm))]
+    public sealed class OverallTestsWasm : OverallTestsBase, IClassFixture<SetupClientsFixtureWasm>
     {
-        protected override string SiteBaseAddress => "https://localhost:5001";
+        public OverallTestsWasm(SetupClientsFixtureWasm setup)
+            : base(setup) { }
     }
 }

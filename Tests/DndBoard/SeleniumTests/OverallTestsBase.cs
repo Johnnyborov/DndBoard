@@ -1,13 +1,11 @@
-using System.Collections.Generic;
 using System.Threading;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
+using DndBoard.SeleniumTests.Fixtures;
+using DndBoard.SeleniumTests.Helpers;
 using Xunit;
-using static DndBoard.SeleniumTests.Helpers.PixelHelper;
 
 namespace DndBoard.SeleniumTests
 {
-    public abstract class OverallTestsBase : OverallTestsSetup
+    public abstract class OverallTestsBase
     {
         private const int AddPosLeftTopX = 10;
         private const int AddPosLeftTopY = 10;
@@ -15,90 +13,91 @@ namespace DndBoard.SeleniumTests
 
         private const int StartPosMiddleX = AddPosLeftTopX + IconSize / 2;
         private const int StartPosMiddleY = AddPosLeftTopY + IconSize / 2;
-        private const int MoveByX = 250;
-        private const int MoveByY = 250;
+
+        private readonly string _dataDir;
+        private readonly ClientHelper _clientHelper;
+        private readonly ClientHelper _clientHelper2;
+        private readonly string _siteBaseAddress;
+
+
+        public OverallTestsBase(SetupClientsFixtureBase setup)
+        {
+            _dataDir = setup.DataDir;
+            _clientHelper = setup.ClientHelper;
+            _clientHelper2 = setup.ClientHelper2;
+            _siteBaseAddress = setup.SiteBaseAddress;
+
+            _clientHelper.IconSize = IconSize;
+            _clientHelper2.IconSize = IconSize;
+        }
 
 
         [Fact]
-        public void UploadIcon_MoveIcon_Works()
+        public void Connection_To_BoardPage_Works()
         {
-            _driver.Navigate().GoToUrl($"{SiteBaseAddress}/board");
-            ConnectToBoard("11");
-            UploadIcon($"{_dataDir}/blueSquare.png");
-            AddIconToMap(StartPosMiddleX, StartPosMiddleY);
-
-            EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
-            MoveIcon(StartPosMiddleX, StartPosMiddleY, MoveByX, MoveByY);
-            EnsureItemWasMoved(StartPosMiddleX, StartPosMiddleY, MoveByX, MoveByY);
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
         }
 
-
-        private void ConnectToBoard(string boardId)
+        [Fact]
+        public void UploadIcon_Works()
         {
-            IWebElement input = _driver.FindElementById("boardId");
-            input.SendKeys(boardId);
-            IWebElement button = _driver.FindElementByXPath("//*[contains(text(), 'Connect')]");
-            button.Click();
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard("1");
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+            _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+            _clientHelper.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
         }
 
-        private void UploadIcon(string filePath)
+        [Fact]
+        public void MoveIcon_Works()
         {
-            IWebElement files = _driver.FindElementByXPath("//*[@type='file']");
-            files.SendKeys(filePath);
-            Thread.Sleep(500);
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard("2");
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+            _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+
+            int moveByX = 250;
+            int moveByY = 250;
+            _clientHelper.MoveIcon(StartPosMiddleX, StartPosMiddleY, moveByX, moveByY);
+            _clientHelper.EnsureItemWasMoved(StartPosMiddleX, StartPosMiddleY, moveByX, moveByY);
         }
 
-        private void AddIconToMap(int clickToX, int clickToY)
+        [Fact]
+        public void Other_Clients_See_AddedMapIcons()
         {
-            IWebElement imgCanvas = _driver.FindElementByCssSelector("#ImagesDivCanvas > canvas");
-            Actions actions = _canvasHelper.MoveToElemLeftTopCorner(imgCanvas);
-            actions.MoveByOffset(clickToX, clickToY).Perform();
-            actions.Click().Perform();
-            Thread.Sleep(500);
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard("3");
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+            _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+
+
+            _clientHelper2.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper2.ConnectToBoard("3");
+            Thread.Sleep(1000);
+            _clientHelper2.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
         }
 
-        private void MoveIcon(int nowX, int nowY, int moveX, int moveY)
+        [Fact]
+        public void Other_Clients_See_MapIconsMovement()
         {
-            IWebElement mapCanvas = _driver.FindElementByCssSelector("#MapCanvasDiv > canvas");
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard("4");
 
-            Actions actions = _canvasHelper.MoveToElemLeftTopCorner(mapCanvas);
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+            _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
 
-            actions.MoveByOffset(nowX, nowY).Perform();
-            actions.ClickAndHold().Perform();
-            Thread.Sleep(100);
 
-            // Moving top left corner => clicking icon middle already moves it by size/2.
-            int realMoveX = moveX - IconSize / 2;
-            int realMoveY = moveY - IconSize / 2;
-            actions.MoveByOffset(realMoveX, realMoveY).Perform();
-            Thread.Sleep(100);
+            _clientHelper2.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper2.ConnectToBoard("4");
 
-            actions.Release().Perform();
-            Thread.Sleep(500);
-        }
+            int moveByX = 250;
+            int moveByY = 250;
+            _clientHelper.MoveIcon(StartPosMiddleX, StartPosMiddleY, moveByX, moveByY);
 
-        private void EnsureIconAddedToMap(int nowX, int nowY)
-        {
-            EnsureItemUnderMouse(nowX, nowY);
-            EnsureItemNotUnderMouse(nowX + IconSize, nowY + IconSize);
-        }
-
-        private void EnsureItemWasMoved(int wasX, int wasY, int movedByX, int movedByY)
-        {
-            EnsureItemNotUnderMouse(wasX, wasY);
-            EnsureItemUnderMouse(wasX + movedByX, wasY + movedByY);
-        }
-
-        private void EnsureItemUnderMouse(int x, int y)
-        {
-            Dictionary<string, int> pixel = _canvasHelper.GetPixel(x, y);
-            Assert.True(IsBluePixel(pixel));
-        }
-
-        private void EnsureItemNotUnderMouse(int x, int y)
-        {
-            Dictionary<string, int> pixel = _canvasHelper.GetPixel(x, y);
-            Assert.False(IsBluePixel(pixel));
+            _clientHelper2.EnsureItemWasMoved(StartPosMiddleX, StartPosMiddleY, moveByX, moveByY);
         }
     }
 }

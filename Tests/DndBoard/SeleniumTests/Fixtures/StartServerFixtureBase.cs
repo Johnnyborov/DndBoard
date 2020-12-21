@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace DndBoard.SeleniumTests.Fixtures
 {
-    public abstract class StartServerBaseFixture : IDisposable
+    public abstract class StartServerFixtureBase : IDisposable
     {
         private const string DotnetCmdName = "dotnet";
         private const int PortCheckTimoutMilliseconds = 500;
@@ -18,7 +18,7 @@ namespace DndBoard.SeleniumTests.Fixtures
         protected abstract int Port { get; }
 
 
-        public StartServerBaseFixture()
+        public StartServerFixtureBase()
         {
             BuildServer();
             StartServer();
