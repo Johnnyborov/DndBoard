@@ -18,13 +18,9 @@ namespace DndBoard.ClientCommon.Components
     public partial class IconsModelsComponent : CanvasBaseComponent
     {
         private string _boardId;
-
-        [Inject]
-        private IFilesClient _Client { get; set; }
-        [Inject]
-        private CanvasMapRenderer _canvasMapRenderer { get; set; }
-        [Inject]
-        private AppState _appState { get; set; }
+        [Inject] private IFilesClient _Client { get; set; }
+        [Inject] private CanvasMapRenderer _canvasMapRenderer { get; set; }
+        [Inject] private AppState _appState { get; set; }
 
 
         private async Task OnInputFileChange(InputFileChangeEventArgs e)
@@ -118,15 +114,11 @@ namespace DndBoard.ClientCommon.Components
             _appState.ChatHubManager.SetNofifyIconsModelsUpdateHandler(OnIconsModelsUpdated);
         }
 
-        private void OnIconsModelsUpdated(string boardId)
+        private async Task OnIconsModelsUpdated(string boardId)
         {
-            _ = RefreshIconsModelsAsync();
-            async Task RefreshIconsModelsAsync()
-            {
-                await ReloadIconsModels();
-                await Redraw();
-                await _appState.ChatHubManager.RequestAllCoords();
-            }
+            await ReloadIconsModels();
+            await Redraw();
+            await _appState.ChatHubManager.RequestAllCoords();
         }
 
         private async Task Redraw()
@@ -137,7 +129,7 @@ namespace DndBoard.ClientCommon.Components
         private async Task OnBoardIdChanged(string boardId)
         {
             _boardId = boardId;
-            OnIconsModelsUpdated(_boardId);
+            await OnIconsModelsUpdated(_boardId);
         }
 
         private async Task ReloadIconsModels()

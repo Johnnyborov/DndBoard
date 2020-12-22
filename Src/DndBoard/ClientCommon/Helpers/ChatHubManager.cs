@@ -26,7 +26,7 @@ namespace DndBoard.ClientCommon.Helpers
         public async Task CloseConnectionAsync() =>
             await _hubConnection.DisposeAsync();
 
-        public void SetConnectedHandler(Action<string> handler) =>
+        public void SetConnectedHandler(Func<string, Task> handler) =>
             _hubConnection.On(BoardsHubContract.Connected, handler);
 
         public void SetCoordsReceivedHandler(Action<string> handler) =>
@@ -35,7 +35,7 @@ namespace DndBoard.ClientCommon.Helpers
         public void SetIconInstanceRemovedHandler(Action<string> handler) =>
             _hubConnection.On(BoardsHubContract.IconInstanceRemoved, handler);
 
-        public void SetNofifyIconsModelsUpdateHandler(Action<string> handler) =>
+        public void SetNofifyIconsModelsUpdateHandler(Func<string, Task> handler) =>
             _hubConnection.On(BoardsHubContract.NotifyIconsModelsUpdate, handler);
 
         public async Task SendCoordsAsync(string coordsChangeDataJson) =>

@@ -8,21 +8,17 @@ using Microsoft.AspNetCore.Components;
 
 namespace DndBoard.ClientCommon.Components
 {
-    public partial class BoardComponent : ComponentBase, IDisposable
+    public partial class BoardComponent : ComponentBase, IAsyncDisposable
     {
         private string _boardId;
         private string _connectedBoardId;
-        [Inject]
-        private ChatHubManager _chatHubManager { get; set; }
-        [Inject]
-        private AppState _appState { get; set; }
+        [Inject] private ChatHubManager _chatHubManager { get; set; }
+        [Inject] private AppState _appState { get; set; }
 
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            _chatHubManager.CloseConnectionAsync();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            await _chatHubManager.CloseConnectionAsync();
         }
 
         protected override async Task OnInitializedAsync()
@@ -38,15 +34,13 @@ namespace DndBoard.ClientCommon.Components
             await _chatHubManager.ConnectAsync(_boardId);
         }
 
-        private void ConnectedHanlder(string boardId)
+        private async Task ConnectedHanlder(string boardId)
         {
             _appState.IconsInstances = new List<DndIconElem>();
             _appState.IconsModels = new List<DndIconElem>();
             _connectedBoardId = boardId;
             StateHasChanged();
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            _appState.InvokeBoardIdChanged(boardId);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            await _appState.InvokeBoardIdChanged(boardId);
         }
     }
 }

@@ -11,14 +11,9 @@ namespace DndBoard.ClientCommon.BaseComponents
 {
     public class CanvasBaseComponent : ComponentBase
     {
-#pragma warning disable IDE0044 // Add readonly modifier
-#pragma warning disable CS0649 // Uninitialized value
         protected ElementReference DivCanvas { get; set; }
         protected BECanvasComponent Canvas { get; set; }
-#pragma warning restore IDE0044 // Add readonly modifier
-#pragma warning restore CS0649 // Uninitialized value
-        [Inject]
-        protected IJSRuntime JsRuntime { get; set; }
+        [Inject] protected IJSRuntime JsRuntime { get; set; }
 
 
         protected async Task<Coords> GetCanvasCoordinatesAsync(MouseEventArgs mouseEventArgs)

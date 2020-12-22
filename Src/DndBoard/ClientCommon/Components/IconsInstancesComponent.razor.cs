@@ -14,12 +14,9 @@ namespace DndBoard.ClientCommon.Components
     public partial class IconsInstancesComponent : CanvasBaseComponent
     {
         private DndIconElem _clickedIcon;
-        [Inject]
-        private AppState _appState { get; set; }
-        [Inject]
-        private CanvasMapRenderer _canvasMapRenderer { get; set; }
-        [Inject]
-        private IJSRuntime _jsRuntime { get; set; }
+        [Inject] private AppState _appState { get; set; }
+        [Inject] private CanvasMapRenderer _canvasMapRenderer { get; set; }
+        [Inject] private IJSRuntime _jsRuntime { get; set; }
 
         private bool _initialized = false;
         protected override async Task OnInitializedAsync()

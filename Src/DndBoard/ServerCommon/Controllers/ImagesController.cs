@@ -18,7 +18,7 @@ namespace DndBoard.ServerCommon.Controllers
 
 
         [HttpGet("{boardId}/{fileId}")]
-        public async Task<IActionResult> GetFile(string boardId, string fileId)
+        public IActionResult GetFile(string boardId, string fileId)
         {
             Board board = _boardManager.GetBoard(boardId);
             byte[] file = board.GetFile(fileId);
@@ -26,7 +26,7 @@ namespace DndBoard.ServerCommon.Controllers
         }
 
         [HttpGet("{boardId}")]
-        public async Task<IEnumerable<string>> GetFilesIds(
+        public IEnumerable<string> GetFilesIds(
             [FromRoute(Name = "boardId")] string boardId)
         {
             Board board = _boardManager.GetBoard(boardId);

@@ -31,9 +31,10 @@ namespace DndBoard.BlazorServer
             await _fileUploadController.DeleteFile(boardId, fileId);
         }
 
-        public async Task<List<string>> GetIconsModelsListAsJsonAsync(string boardId)
+        public Task<List<string>> GetIconsModelsListAsJsonAsync(string boardId)
         {
-            return (await _imagesController.GetFilesIds(boardId)).ToList();
+            List<string> res = (_imagesController.GetFilesIds(boardId)).ToList();
+            return Task.FromResult(res);
         }
     }
 }
