@@ -13,19 +13,12 @@ namespace DndBoard.ClientCommon.Store
         public List<DndIconElem> IconsModels { get; set; }
 
         public event BoardIdChangedHandlerAsync BoardIdChangedAsync;
-        public event AllModelsLoadedHandlerAsync AllModelsLoadedAsync;
 
 
         public async Task InvokeBoardIdChangedAsync(string boardId)
         {
             if (BoardIdChangedAsync is not null)
                 await BoardIdChangedAsync.Invoke(boardId);
-        }
-
-        public async Task InvokeAllModelsLoadedAsync()
-        {
-            if (AllModelsLoadedAsync is not null)
-                await AllModelsLoadedAsync.Invoke();
         }
     }
 }

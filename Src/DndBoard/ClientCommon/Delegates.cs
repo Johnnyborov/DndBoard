@@ -11,5 +11,4 @@ namespace DndBoard.ClientCommon
 
     public delegate Task RedrawRequestedHandlerAsync();
     public delegate Task BoardIdChangedHandlerAsync(string boardId);
-    public delegate Task AllModelsLoadedHandlerAsync();
 }

@@ -12,7 +12,7 @@ namespace DndBoard.ClientCommon.Helpers
 
 
         public async Task RedrawIconsByCoordsAsync(
-            string divCanvasId, IJSRuntime jsRuntime, List<DndIconElem> icons)
+            string divCanvasId, IJSRuntime jsRuntime, IEnumerable<DndIconElem> icons)
         {
             await _semaphore.WaitAsync();
             try

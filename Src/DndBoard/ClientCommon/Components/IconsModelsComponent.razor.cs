@@ -133,7 +133,6 @@ namespace DndBoard.ClientCommon.Components
                 _appState.IconsModels[i].Coords = new Coords { X = 50, Y = 50 + i * 110 };
 
             StateHasChanged();
-            await _appState.InvokeAllModelsLoadedAsync();
         }
 
         private async Task<List<DndIconElem>> CreateNewIconsModelsAsync(UploadedFiles uploadedFiles)

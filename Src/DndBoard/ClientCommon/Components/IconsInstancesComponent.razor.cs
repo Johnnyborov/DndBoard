@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoard.ClientCommon.BaseComponents;
 using DndBoard.ClientCommon.Helpers;
@@ -27,17 +28,17 @@ namespace DndBoard.ClientCommon.Components
             else
                 _initialized = true;
 
-            _appState.AllModelsLoadedAsync += OnAllModelsLoadedAsync;
+            _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
             _appState.BoardRenderer.RedrawRequestedAsync += OnRedrawAsync;
             _appState.BoardHubManager.CoordsChanged += OnCoordsReceived;
             _appState.BoardHubManager.IconInstanceRemoved += OnIconInstanceRemoved;
         }
 
-        private async Task OnAllModelsLoadedAsync()
+
+        private async Task OnBoardIdChangedAsync(string boardId)
         {
             await _appState.BoardHubManager.RequestAllCoordsAsync();
         }
-
 
         private void OnIconInstanceRemoved(string iconInstanceId)
         {
@@ -49,23 +50,18 @@ namespace DndBoard.ClientCommon.Components
             CoordsChangeData coordsChangeData = JsonSerializer
                 .Deserialize<CoordsChangeData>(coordsChangeDataJson);
 
-            if (!_appState.IconsInstances.Exists(img => img.InstanceId == coordsChangeData.InstanceId)
-                && _appState.IconsModels.Exists(x => x.ModelId == coordsChangeData.ModelId))
+            if (!_appState.IconsInstances.Exists(img => img.InstanceId == coordsChangeData.InstanceId))
             {
                 _appState.IconsInstances.Add(new DndIconElem
                 {
                     InstanceId = coordsChangeData.InstanceId,
                     Coords = coordsChangeData.Coords,
                     ModelId = coordsChangeData.ModelId,
-                    Ref = _appState.IconsModels.Find(x => x.ModelId == coordsChangeData.ModelId).Ref,
                 });
             }
 
-            if (_appState.IconsInstances.Exists(img => img.InstanceId == coordsChangeData.InstanceId))
-            {
-                _appState.IconsInstances.Find(img => img.InstanceId == coordsChangeData.InstanceId)
-                    .Coords = coordsChangeData.Coords;
-            }
+            _appState.IconsInstances.Find(img => img.InstanceId == coordsChangeData.InstanceId)
+                .Coords = coordsChangeData.Coords;
         }
 
         private async Task OnRedrawAsync()
@@ -73,7 +69,13 @@ namespace DndBoard.ClientCommon.Components
             if (_appState.IconsInstances is null)
                 return;
 
-            await _canvasMapRenderer.RedrawIconsByCoordsAsync("IconsInstancesCanvasDiv", _jsRuntime, _appState.IconsInstances);
+            _appState.IconsInstances.ForEach(x =>
+                x.Ref = _appState.IconsModels.FirstOrDefault(y => y.ModelId == x.ModelId)?.Ref
+            );
+
+            await _canvasMapRenderer.RedrawIconsByCoordsAsync(
+                "IconsInstancesCanvasDiv", _jsRuntime, _appState.IconsInstances
+            );
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
