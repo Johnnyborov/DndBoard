@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoard.ClientCommon.BaseComponents;
 using DndBoard.ClientCommon.Helpers;
@@ -28,17 +27,17 @@ namespace DndBoard.ClientCommon.Components
         {
             int maxAllowedFiles = 777;
 
-            List<UploadedFile> files = new();
+            List<ModelFile> files = new();
             foreach (IBrowserFile imageFile in e.GetMultipleFiles(maxAllowedFiles))
             {
-                UploadedFile uploadedFile = await ConvertToUploadedFileAsync(imageFile);
-                files.Add(uploadedFile);
+                ModelFile modelFile = await ConvertToModelFileAsync(imageFile);
+                files.Add(modelFile);
             }
 
             await SendFilesToServerAsync(files);
         }
 
-        private static async Task<UploadedFile> ConvertToUploadedFileAsync(IBrowserFile imageFile)
+        private static async Task<ModelFile> ConvertToModelFileAsync(IBrowserFile imageFile)
         {
             string format = "image/png";
 
@@ -50,21 +49,20 @@ namespace DndBoard.ClientCommon.Components
             await stream.CopyToAsync(ms);
             stream.Close();
 
-            UploadedFile uploadedFile = new();
-            uploadedFile.FileName = resizedImageFile.Name;
-            uploadedFile.FileContent = ms.ToArray();
+            ModelFile modelFile = new();
+            modelFile.ModelContent = ms.ToArray();
             ms.Close();
 
-            return uploadedFile;
+            return modelFile;
         }
 
-        private async Task SendFilesToServerAsync(List<UploadedFile> files)
+        private async Task SendFilesToServerAsync(List<ModelFile> files)
         {
-            UploadedFiles uploadedFiles = new();
-            uploadedFiles.BoardId = _boardId;
-            uploadedFiles.Files = files.ToArray();
+            ModelsFiles modelsFiles = new();
+            modelsFiles.BoardId = _boardId;
+            modelsFiles.Files = files.ToArray();
 
-            await _appState.BoardHubManager.AddModelsAsync(uploadedFiles);
+            await _appState.BoardHubManager.AddModelsAsync(modelsFiles);
         }
 
         private async Task OnRightClickAsync(MouseEventArgs mouseEventArgs)
@@ -90,8 +88,7 @@ namespace DndBoard.ClientCommon.Components
                 Coords = new Coords { X = 10, Y = 10 },
                 ModelId = clickedIcon.ModelId,
             };
-            string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
-            await _appState.BoardHubManager.SendCoordsAsync(coordsChangeDataJson);
+            await _appState.BoardHubManager.SendCoordsAsync(coordsChangeData);
         }
 
         private DndIconElem GetClickedIcon(Coords coords)
@@ -122,9 +119,9 @@ namespace DndBoard.ClientCommon.Components
             _appState.BoardHubManager.ModelDeleted += OnModelDeletedAsync;
         }
 
-        private async Task OnModelAddedAsync(UploadedFiles uploadedFiles)
+        private async Task OnModelAddedAsync(ModelsFiles modelsFiles)
         {
-            List<DndIconElem> newModels = await CreateNewIconsModelsAsync(uploadedFiles);
+            List<DndIconElem> newModels = await CreateNewIconsModelsAsync(modelsFiles);
 
             newModels.RemoveAll(x => _appState.IconsModels.Any(y => y.ModelId == x.ModelId));
             _appState.IconsModels.AddRange(newModels.Except(_appState.IconsModels));
@@ -135,32 +132,32 @@ namespace DndBoard.ClientCommon.Components
             StateHasChanged();
         }
 
-        private async Task<List<DndIconElem>> CreateNewIconsModelsAsync(UploadedFiles uploadedFiles)
+        private async Task<List<DndIconElem>> CreateNewIconsModelsAsync(ModelsFiles modelsFiles)
         {
             List<DndIconElem> newModels;
 
             if (_jsRuntime is IJSUnmarshalledRuntime jsUnmarshalledRuntime)
             {
-                newModels = uploadedFiles.Files
+                newModels = modelsFiles.Files
                     .Select(file =>
                     {
                         string url = jsUnmarshalledRuntime.InvokeUnmarshalled<byte[], string>(
-                            "createFileURLUnmarshalled", file.FileContent
+                            "createFileURLUnmarshalled", file.ModelContent
                         );
 
-                        return new DndIconElem { ModelId = file.FileName, Url = url };
+                        return new DndIconElem { ModelId = file.ModelId, Url = url };
                     }).ToList();
             }
             else
             {
-                List<Task<DndIconElem>> newModelsTasks = uploadedFiles.Files
+                List<Task<DndIconElem>> newModelsTasks = modelsFiles.Files
                     .Select(async file =>
                     {
                         string url = await _jsRuntime.InvokeAsync<string>(
-                            "createFileURL", file.FileContent
+                            "createFileURL", file.ModelContent
                         );
 
-                        return new DndIconElem { ModelId = file.FileName, Url = url };
+                        return new DndIconElem { ModelId = file.ModelId, Url = url };
                     }).ToList();
 
                 await Task.WhenAll(newModelsTasks);

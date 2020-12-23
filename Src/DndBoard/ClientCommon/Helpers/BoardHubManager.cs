@@ -34,9 +34,9 @@ namespace DndBoard.ClientCommon.Helpers
 
         public void SetupEventHandlers()
         {
-            _hubConnection.On(BoardsHubContract.ModelsAdded, (Func<UploadedFiles, Task>)InvokeModelsAddedAsync);
+            _hubConnection.On(BoardsHubContract.ModelsAdded, (Func<ModelsFiles, Task>)InvokeModelsAddedAsync);
             _hubConnection.On(BoardsHubContract.ModelDeleted, (Action<string>)InvokeModelDeleted);
-            _hubConnection.On(BoardsHubContract.CoordsChanged, (Action<string>)InvokeCoordsChanged);
+            _hubConnection.On(BoardsHubContract.CoordsChanged, (Action<CoordsChangeData>)InvokeCoordsChanged);
             _hubConnection.On(BoardsHubContract.IconInstanceRemoved, (Action<string>)InvokeIconInstanceRemoved);
             _hubConnection.On(BoardsHubContract.Connected, (Func<string, Task>)InvokeConnectedAsync);
         }
@@ -55,15 +55,15 @@ namespace DndBoard.ClientCommon.Helpers
             await _hubConnection.SendAsync(BoardsHubContract.RequestAllCoords, _boardId);
 
 
-        public async Task AddModelsAsync(UploadedFiles uploadedFiles) =>
-            await _hubConnection.SendAsync(BoardsHubContract.AddModels, uploadedFiles);
+        public async Task AddModelsAsync(ModelsFiles modelsFiles) =>
+            await _hubConnection.SendAsync(BoardsHubContract.AddModels, modelsFiles);
 
         public async Task DeleteModelAsync(string modelId) =>
             await _hubConnection.SendAsync(BoardsHubContract.DeleteModel, _boardId, modelId);
 
 
-        public async Task SendCoordsAsync(string coordsChangeDataJson) =>
-            await _hubConnection.SendAsync(BoardsHubContract.CoordsChanged, _boardId, coordsChangeDataJson);
+        public async Task SendCoordsAsync(CoordsChangeData coordsChangeData) =>
+            await _hubConnection.SendAsync(BoardsHubContract.CoordsChanged, _boardId, coordsChangeData);
 
         public async Task SendIconInstanceRemovedAsync(string instanceId) =>
             await _hubConnection.SendAsync(BoardsHubContract.IconInstanceRemoved, _boardId, instanceId);
@@ -76,10 +76,10 @@ namespace DndBoard.ClientCommon.Helpers
         }
 
 
-        private async Task InvokeModelsAddedAsync(UploadedFiles uploadedFiles)
+        private async Task InvokeModelsAddedAsync(ModelsFiles modelsFiles)
         {
             if (ModelsAddedAsync is not null)
-                await ModelsAddedAsync.Invoke(uploadedFiles);
+                await ModelsAddedAsync.Invoke(modelsFiles);
         }
 
         private void InvokeModelDeleted(string modelId)
@@ -88,10 +88,10 @@ namespace DndBoard.ClientCommon.Helpers
                 ModelDeleted.Invoke(modelId);
         }
 
-        private void InvokeCoordsChanged(string coordsChangeDataJson)
+        private void InvokeCoordsChanged(CoordsChangeData coordsChangeData)
         {
             if (CoordsChanged is not null)
-                CoordsChanged.Invoke(coordsChangeDataJson);
+                CoordsChanged.Invoke(coordsChangeData);
         }
 
         private void InvokeIconInstanceRemoved(string iconInstanceId)

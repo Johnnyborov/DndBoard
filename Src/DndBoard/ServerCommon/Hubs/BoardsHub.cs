@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoard.Shared;
 using DndBoard.Shared.Models;
@@ -21,17 +20,15 @@ namespace DndBoard.ServerCommon.Hubs
         public async Task RequestAllModels(string boardId)
         {
             Board board = _boardsManager.GetBoard(boardId);
+            List<ModelFile> files = new();
             foreach (DndIcon icon in board.IconsInstances)
             {
-                byte[] model = board.GetFile(icon.ModelId);
-                UploadedFiles uploadedFiles = new UploadedFiles();
-                uploadedFiles.BoardId = boardId;
-                uploadedFiles.Files = new UploadedFile[]
-                {
-                    new UploadedFile { FileName = icon.ModelId, FileContent = model }
-                };
-                await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelsAdded, uploadedFiles);
+                byte[] modelContent = board.GetFile(icon.ModelId);
+                ModelFile file = new() { ModelId = icon.ModelId, ModelContent = modelContent };
+                files.Add(file);
             }
+            ModelsFiles modelsFiles = new() { BoardId = boardId, Files = files.ToArray() };
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelsAdded, modelsFiles);
         }
 
         [HubMethodName(BoardsHubContract.RequestAllCoords)]
@@ -47,22 +44,21 @@ namespace DndBoard.ServerCommon.Hubs
                     ModelId = icon.ModelId,
                 };
 
-                string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
-                await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
+                await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsChangeData);
             }
         }
 
 
         [HubMethodName(BoardsHubContract.AddModels)]
-        public async Task AddModels(UploadedFiles uploadedFiles)
+        public async Task AddModels(ModelsFiles modelsFiles)
         {
-            string boardId = uploadedFiles.BoardId;
+            string boardId = modelsFiles.BoardId;
             Board board = _boardsManager.GetBoard(boardId);
 
-            foreach (UploadedFile file in uploadedFiles.Files)
-                file.FileName = board.AddFile(file.FileContent);
+            foreach (ModelFile file in modelsFiles.Files)
+                file.ModelId = board.AddFile(file.ModelContent);
 
-            await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelsAdded, uploadedFiles);
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelsAdded, modelsFiles);
         }
 
         [HubMethodName(BoardsHubContract.DeleteModel)]
@@ -75,11 +71,9 @@ namespace DndBoard.ServerCommon.Hubs
 
 
         [HubMethodName(BoardsHubContract.CoordsChanged)]
-        public async Task SendCoords(string boardId, string coordsChangeDataJson)
+        public async Task SendCoords(string boardId, CoordsChangeData coordsChangeData)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            CoordsChangeData coordsChangeData = JsonSerializer
-                .Deserialize<CoordsChangeData>(coordsChangeDataJson);
 
             if (!board.IconsInstances.Exists(icon => icon.InstanceId == coordsChangeData.InstanceId))
                 board.IconsInstances.Add(new DndIcon
@@ -92,7 +86,7 @@ namespace DndBoard.ServerCommon.Hubs
                 board.IconsInstances.Find(icon => icon.InstanceId == coordsChangeData.InstanceId)
                     .Coords = coordsChangeData.Coords;
 
-            await Clients.Group(boardId).SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.CoordsChanged, coordsChangeData);
         }
 
         [HubMethodName(BoardsHubContract.IconInstanceRemoved)]

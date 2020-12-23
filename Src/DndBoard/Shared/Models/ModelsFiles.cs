@@ -1,8 +1,8 @@
 ﻿namespace DndBoard.Shared.Models
 {
-    public class UploadedFiles
+    public class ModelsFiles
     {
         public string BoardId { get; set; }
-        public UploadedFile[] Files { get; set; }
+        public ModelFile[] Files { get; set; }
     }
 }

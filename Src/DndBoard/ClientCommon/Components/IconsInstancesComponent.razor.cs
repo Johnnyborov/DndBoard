@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using DndBoard.ClientCommon.BaseComponents;
 using DndBoard.ClientCommon.Helpers;
@@ -45,11 +44,8 @@ namespace DndBoard.ClientCommon.Components
             _appState.IconsInstances.RemoveAll(icon => icon.InstanceId == iconInstanceId);
         }
 
-        private void OnCoordsReceived(string coordsChangeDataJson)
+        private void OnCoordsReceived(CoordsChangeData coordsChangeData)
         {
-            CoordsChangeData coordsChangeData = JsonSerializer
-                .Deserialize<CoordsChangeData>(coordsChangeDataJson);
-
             if (!_appState.IconsInstances.Exists(img => img.InstanceId == coordsChangeData.InstanceId))
             {
                 _appState.IconsInstances.Add(new DndIconElem
@@ -93,8 +89,7 @@ namespace DndBoard.ClientCommon.Components
                     Coords = coords,
                     ModelId = clickedIcon.ModelId,
                 };
-                string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
-                await _appState.BoardHubManager.SendCoordsAsync(coordsChangeDataJson);
+                await _appState.BoardHubManager.SendCoordsAsync(coordsChangeData);
             }
         }
 

@@ -3,9 +3,9 @@ using DndBoard.Shared.Models;
 
 namespace DndBoard.ClientCommon
 {
-    public delegate Task ModelsAddedHandlerAsync(UploadedFiles uploadedFiles);
+    public delegate Task ModelsAddedHandlerAsync(ModelsFiles modelsFiles);
     public delegate void ModelDeletedHandler(string modelId);
-    public delegate void CoordsChangedHandler(string coordsChangeDataJson);
+    public delegate void CoordsChangedHandler(CoordsChangeData coordsChangeData);
     public delegate void IconInstanceRemovedHandler(string iconInstanceId);
     public delegate Task ConnectedHandlerAsync(string boardId);
 
