@@ -66,11 +66,11 @@ namespace DndBoard.ServerCommon.Hubs
         }
 
         [HubMethodName(BoardsHubContract.DeleteModel)]
-        public async Task DeleteModel(string boardId, string fileId)
+        public async Task DeleteModel(string boardId, string modelId)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            board.DeleteFile(fileId);
-            await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelDeleted, boardId);
+            board.DeleteFile(modelId);
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelDeleted, modelId);
         }
 
 

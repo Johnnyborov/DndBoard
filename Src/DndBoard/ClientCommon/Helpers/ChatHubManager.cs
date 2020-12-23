@@ -46,8 +46,8 @@ namespace DndBoard.ClientCommon.Helpers
             _hubConnection.On(BoardsHubContract.ModelsAdded, handler);
 
 
-        public async Task DeleteModelAsync(string fileId) =>
-            await _hubConnection.SendAsync(BoardsHubContract.DeleteModel, _boardId, fileId);
+        public async Task DeleteModelAsync(string modelId) =>
+            await _hubConnection.SendAsync(BoardsHubContract.DeleteModel, _boardId, modelId);
 
         public void SetModelDeletedHandler(Action<string> handler) =>
             _hubConnection.On(BoardsHubContract.ModelDeleted, handler);

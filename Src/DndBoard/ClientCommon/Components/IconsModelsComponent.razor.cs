@@ -74,7 +74,7 @@ namespace DndBoard.ClientCommon.Components
             if (clickedIcon is null)
                 return;
 
-            await _appState.ChatHubManager.DeleteModelAsync(clickedIcon.InstanceId);
+            await _appState.ChatHubManager.DeleteModelAsync(clickedIcon.ModelId);
         }
 
         private async Task OnClickAsync(MouseEventArgs mouseEventArgs)
@@ -118,7 +118,6 @@ namespace DndBoard.ClientCommon.Components
                 _initialized = true;
 
             _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
-            _appState.ChatHubManager.SetModelsAddedHandler(OnModelAddedAsync);
             _appState.BoardRenderer.RedrawRequestedAsync += RedrawAsync;
         }
 
@@ -131,7 +130,6 @@ namespace DndBoard.ClientCommon.Components
                 _appState.IconsModels[i].Coords = new Coords { X = 50, Y = 50 + i * 110 };
 
             StateHasChanged();
-            await _appState.ChatHubManager.RequestAllCoordsAsync();
         }
 
         private async Task<List<DndIconElem>> CreateNewIconsModelsAsync(UploadedFiles uploadedFiles)
@@ -169,6 +167,11 @@ namespace DndBoard.ClientCommon.Components
             return newModels;
         }
 
+        private void OnModelDeletedAsync(string modelId)
+        {
+            _appState.IconsModels.RemoveAll(icon => icon.ModelId == modelId);
+        }
+
         private async Task RedrawAsync()
         {
             if (_appState.IconsModels is null)
@@ -181,6 +184,8 @@ namespace DndBoard.ClientCommon.Components
         {
             _boardId = boardId;
             StateHasChanged();
+            _appState.ChatHubManager.SetModelsAddedHandler(OnModelAddedAsync);
+            _appState.ChatHubManager.SetModelDeletedHandler(OnModelDeletedAsync);
             await _appState.ChatHubManager.RequestAllModelsAsync();
         }
     }

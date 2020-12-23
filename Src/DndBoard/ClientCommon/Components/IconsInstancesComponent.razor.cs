@@ -27,15 +27,15 @@ namespace DndBoard.ClientCommon.Components
             else
                 _initialized = true;
 
-            _appState.BoardIdChangedAsync += OnBoardIdChanged;
+            _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
             _appState.BoardRenderer.RedrawRequestedAsync += Redraw;
         }
 
-        private Task OnBoardIdChanged(string boardId)
+        private async Task OnBoardIdChangedAsync(string boardId)
         {
             _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
             _appState.ChatHubManager.SetIconInstanceRemovedHandler(IconInstanceRemovedHandler);
-            return Task.CompletedTask;
+            await _appState.ChatHubManager.RequestAllCoordsAsync();
         }
 
 
