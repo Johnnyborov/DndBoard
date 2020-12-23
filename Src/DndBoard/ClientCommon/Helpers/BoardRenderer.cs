@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace DndBoard.ClientCommon.Helpers
@@ -25,7 +24,7 @@ namespace DndBoard.ClientCommon.Helpers
         }
 
         [JSInvokable]
-        public async Task RedrawAsync()
+        public async Task InvokeRedrawRequestedAsync()
         {
             if (RedrawRequestedAsync is not null)
                 await RedrawRequestedAsync.Invoke();

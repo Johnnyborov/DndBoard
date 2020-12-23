@@ -27,24 +27,24 @@ namespace DndBoard.ClientCommon.Components
             else
                 _initialized = true;
 
-            _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
-            _appState.BoardRenderer.RedrawRequestedAsync += Redraw;
-            _appState.ChatHubManager.CoordsChanged += CoordsReceivedHandler;
-            _appState.ChatHubManager.IconInstanceRemoved += IconInstanceRemovedHandler;
+            _appState.AllModelsLoadedAsync += OnAllModelsLoadedAsync;
+            _appState.BoardRenderer.RedrawRequestedAsync += OnRedrawAsync;
+            _appState.ChatHubManager.CoordsChanged += OnCoordsReceived;
+            _appState.ChatHubManager.IconInstanceRemoved += OnIconInstanceRemoved;
         }
 
-        private async Task OnBoardIdChangedAsync(string boardId)
+        private async Task OnAllModelsLoadedAsync()
         {
-
+            await _appState.ChatHubManager.RequestAllCoordsAsync();
         }
 
 
-        private void IconInstanceRemovedHandler(string iconInstanceId)
+        private void OnIconInstanceRemoved(string iconInstanceId)
         {
             _appState.IconsInstances.RemoveAll(icon => icon.InstanceId == iconInstanceId);
         }
 
-        private void CoordsReceivedHandler(string coordsChangeDataJson)
+        private void OnCoordsReceived(string coordsChangeDataJson)
         {
             CoordsChangeData coordsChangeData = JsonSerializer
                 .Deserialize<CoordsChangeData>(coordsChangeDataJson);
@@ -68,7 +68,7 @@ namespace DndBoard.ClientCommon.Components
             }
         }
 
-        private async Task Redraw()
+        private async Task OnRedrawAsync()
         {
             if (_appState.IconsInstances is null)
                 return;

@@ -117,7 +117,7 @@ namespace DndBoard.ClientCommon.Components
                 _initialized = true;
 
             _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
-            _appState.BoardRenderer.RedrawRequestedAsync += RedrawAsync;
+            _appState.BoardRenderer.RedrawRequestedAsync += OnRedrawAsync;
             _appState.ChatHubManager.ModelsAddedAsync += OnModelAddedAsync;
             _appState.ChatHubManager.ModelDeleted += OnModelDeletedAsync;
         }
@@ -133,7 +133,7 @@ namespace DndBoard.ClientCommon.Components
                 _appState.IconsModels[i].Coords = new Coords { X = 50, Y = 50 + i * 110 };
 
             StateHasChanged();
-            await _appState.ChatHubManager.RequestAllCoordsAsync();
+            await _appState.InvokeAllModelsLoadedAsync();
         }
 
         private async Task<List<DndIconElem>> CreateNewIconsModelsAsync(UploadedFiles uploadedFiles)
@@ -176,7 +176,7 @@ namespace DndBoard.ClientCommon.Components
             _appState.IconsModels.RemoveAll(icon => icon.ModelId == modelId);
         }
 
-        private async Task RedrawAsync()
+        private async Task OnRedrawAsync()
         {
             if (_appState.IconsModels is null)
                 return;

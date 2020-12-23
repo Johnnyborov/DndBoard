@@ -30,7 +30,7 @@ namespace DndBoard.ClientCommon.Components
 
             await _boardRenderer.InitializeAsync();
 
-            _chatHubManager.ConnectedAsync += ConnectedHanlderAsync;
+            _chatHubManager.ConnectedAsync += OnConnectedAsync;
             _chatHubManager.SetupConnectionAsync();
             await _chatHubManager.StartConnectionAsync();
             _chatHubManager.SetupEventHandlers();
@@ -47,7 +47,7 @@ namespace DndBoard.ClientCommon.Components
             await _chatHubManager.ConnectAsync(_boardId);
         }
 
-        private async Task ConnectedHanlderAsync(string boardId)
+        private async Task OnConnectedAsync(string boardId)
         {
             _appState.IconsInstances = new List<DndIconElem>();
             _appState.IconsModels = new List<DndIconElem>();
