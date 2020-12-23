@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -84,7 +83,6 @@ namespace DndBoard.ClientCommon.Components
  
             CoordsChangeData coordsChangeData = new CoordsChangeData
             {
-                InstanceId = Guid.NewGuid().ToString(),
                 Coords = new Coords { X = 10, Y = 10 },
                 ModelId = clickedIcon.ModelId,
             };

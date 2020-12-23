@@ -1,40 +1,42 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using DndBoard.Shared.Models;
 
 namespace DndBoard.ServerCommon.Hubs
 {
     public class Board
     {
-        private readonly ConcurrentDictionary<string, byte[]> _files =
-            new ConcurrentDictionary<string, byte[]>();
-
+        public ConcurrentDictionary<string, ModelFile> ModelsFiles { get; init; } = new();
+        public ConcurrentDictionary<string, DndIcon> IconsInstances { get; init; } = new();
         public string BoardId { get; set; }
-        public List<DndIcon> IconsInstances { get; set; }
 
 
-        public byte[] GetFile(string fileId)
-        {
-            return _files[fileId];
-        }
-
-        public void DeleteFile(string fileId)
-        {
-            _files.Remove(fileId, out _);
-        }
-
-        public string AddFile(byte[] file)
+        public string AddIconInstance(DndIcon icon)
         {
             string id = Guid.NewGuid().ToString();
-            _files.TryAdd(id, file);
+            icon.InstanceId = id;
+            IconsInstances.TryAdd(id, icon);
             return id;
         }
 
-        public IEnumerable<string> GetFilesIds()
+        public void ChangeIconInstanceCoords(string instanceId, Coords newCoords)
         {
-            return _files.Keys.ToList();
+            IconsInstances[instanceId].Coords = newCoords;
+        }
+
+
+        public void DeleteModelFile(string modelId)
+        {
+            ModelsFiles.Remove(modelId, out _);
+        }
+
+        public string AddModelFile(ModelFile model)
+        {
+            string id = Guid.NewGuid().ToString();
+            model.ModelId = id;
+            ModelsFiles.TryAdd(id, model);
+            return id;
         }
     }
 }

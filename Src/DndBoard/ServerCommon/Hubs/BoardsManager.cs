@@ -8,7 +8,16 @@ namespace DndBoard.ServerCommon.Hubs
             new ConcurrentDictionary<string, Board>();
 
 
-        public bool BoardExists(string boardId)
+        public void CreateBoardIfDoesntExist(string boardId)
+        {
+            if (!BoardExists(boardId))
+                AddBoard(new Board
+                {
+                    BoardId = boardId,
+                });
+        }
+
+        private bool BoardExists(string boardId)
         {
             return _boards.ContainsKey(boardId);
         }

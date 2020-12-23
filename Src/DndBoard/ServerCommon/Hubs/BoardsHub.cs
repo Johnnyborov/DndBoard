@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DndBoard.Shared;
 using DndBoard.Shared.Models;
@@ -20,14 +21,8 @@ namespace DndBoard.ServerCommon.Hubs
         public async Task RequestAllModels(string boardId)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            List<ModelFile> files = new();
-            foreach (DndIcon icon in board.IconsInstances)
-            {
-                byte[] modelContent = board.GetFile(icon.ModelId);
-                ModelFile file = new() { ModelId = icon.ModelId, ModelContent = modelContent };
-                files.Add(file);
-            }
-            ModelsFiles modelsFiles = new() { BoardId = boardId, Files = files.ToArray() };
+            ModelFile[] files = board.ModelsFiles.Values.ToArray();
+            ModelsFiles modelsFiles = new() { BoardId = boardId, Files = files };
             await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelsAdded, modelsFiles);
         }
 
@@ -35,29 +30,28 @@ namespace DndBoard.ServerCommon.Hubs
         public async Task RequestAllCoords(string boardId)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            foreach (DndIcon icon in board.IconsInstances)
+            foreach (DndIcon icon in board.IconsInstances.Values)
             {
-                CoordsChangeData coordsChangeData = new CoordsChangeData
-                {
-                    InstanceId = icon.InstanceId,
-                    Coords = icon.Coords,
-                    ModelId = icon.ModelId,
-                };
-
+                CoordsChangeData coordsChangeData = CreateCoordsChangeData(icon);
                 await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsChangeData);
             }
         }
 
+        private static CoordsChangeData CreateCoordsChangeData(DndIcon icon) =>
+            new CoordsChangeData
+            {
+                InstanceId = icon.InstanceId,
+                Coords = icon.Coords,
+                ModelId = icon.ModelId,
+            };
 
         [HubMethodName(BoardsHubContract.AddModels)]
         public async Task AddModels(ModelsFiles modelsFiles)
         {
             string boardId = modelsFiles.BoardId;
             Board board = _boardsManager.GetBoard(boardId);
-
             foreach (ModelFile file in modelsFiles.Files)
-                file.ModelId = board.AddFile(file.ModelContent);
-
+                file.ModelId = board.AddModelFile(file);
             await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelsAdded, modelsFiles);
         }
 
@@ -65,7 +59,7 @@ namespace DndBoard.ServerCommon.Hubs
         public async Task DeleteModel(string boardId, string modelId)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            board.DeleteFile(modelId);
+            board.DeleteModelFile(modelId);
             await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelDeleted, modelId);
         }
 
@@ -74,26 +68,29 @@ namespace DndBoard.ServerCommon.Hubs
         public async Task SendCoords(string boardId, CoordsChangeData coordsChangeData)
         {
             Board board = _boardsManager.GetBoard(boardId);
-
-            if (!board.IconsInstances.Exists(icon => icon.InstanceId == coordsChangeData.InstanceId))
-                board.IconsInstances.Add(new DndIcon
-                {
-                    InstanceId = coordsChangeData.InstanceId,
-                    Coords = coordsChangeData.Coords,
-                    ModelId = coordsChangeData.ModelId,
-                });
-            else
-                board.IconsInstances.Find(icon => icon.InstanceId == coordsChangeData.InstanceId)
-                    .Coords = coordsChangeData.Coords;
-
+            AddNewIconInstanceOrUpdateCoords(coordsChangeData, board);
             await Clients.Group(boardId).SendAsync(BoardsHubContract.CoordsChanged, coordsChangeData);
+        }
+
+        private static void AddNewIconInstanceOrUpdateCoords(CoordsChangeData coordsChangeData, Board board)
+        {
+            if (coordsChangeData.InstanceId is null)
+                coordsChangeData.InstanceId = board.AddIconInstance(
+                    new DndIcon
+                    {
+                        Coords = coordsChangeData.Coords,
+                        ModelId = coordsChangeData.ModelId,
+                    }
+                );
+            else
+                board.ChangeIconInstanceCoords(coordsChangeData.InstanceId, coordsChangeData.Coords);
         }
 
         [HubMethodName(BoardsHubContract.IconInstanceRemoved)]
         public async Task SendIconInstanceRemoved(string boardId, string instanceId)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            board.IconsInstances.RemoveAll(icon => icon.InstanceId == instanceId);
+            board.IconsInstances.Remove(instanceId, out DndIcon _);
             await Clients.Group(boardId).SendAsync(BoardsHubContract.IconInstanceRemoved, instanceId);
         }
 
@@ -101,13 +98,7 @@ namespace DndBoard.ServerCommon.Hubs
         [HubMethodName(BoardsHubContract.Connect)]
         public async Task Connect(string boardId)
         {
-            if (!_boardsManager.BoardExists(boardId))
-                _boardsManager.AddBoard(new Board
-                {
-                    BoardId = boardId,
-                    IconsInstances = new List<DndIcon>()
-                });
-
+            _boardsManager.CreateBoardIfDoesntExist(boardId);
             await Groups.AddToGroupAsync(Context.ConnectionId, boardId);
             await Clients.Caller.SendAsync(BoardsHubContract.Connected, boardId);
         }
