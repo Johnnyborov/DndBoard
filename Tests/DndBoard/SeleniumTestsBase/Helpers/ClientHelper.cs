@@ -31,6 +31,12 @@ namespace DndBoard.SeleniumTestsBase.Helpers
             _canvasHelper = new CanvasHelper(_driver);
         }
 
+
+        public void SetCurrentCanvasId(string divCanvasId)
+        {
+            _canvasHelper.DivCanvasId = divCanvasId;
+        }
+
         public void OpenUrl(string url)
         {
             _driver.Navigate().GoToUrl(url);
@@ -57,6 +63,15 @@ namespace DndBoard.SeleniumTestsBase.Helpers
             Actions actions = _canvasHelper.MoveToElemLeftTopCorner(iconsModelsCanvas);
             actions.MoveByOffset(clickToX, clickToY).Perform();
             actions.Click().Perform();
+            Thread.Sleep(500);
+        }
+
+        public void DeleteIconFromCanvas(string divCanvasId, int clickToX, int clickToY)
+        {
+            IWebElement iconsModelsCanvas = _driver.FindElementByCssSelector($"#{divCanvasId} > canvas");
+            Actions actions = _canvasHelper.MoveToElemLeftTopCorner(iconsModelsCanvas);
+            actions.MoveByOffset(clickToX, clickToY).Perform();
+            actions.ContextClick().Perform();
             Thread.Sleep(500);
         }
 
@@ -90,6 +105,11 @@ namespace DndBoard.SeleniumTestsBase.Helpers
         {
             EnsureItemNotUnderMouse(wasX, wasY);
             EnsureItemUnderMouse(wasX + movedByX, wasY + movedByY);
+        }
+
+        public void EnsureIconDeletedFromMap(int wasX, int wasY)
+        {
+            EnsureItemNotUnderMouse(wasX, wasY);
         }
 
         private void EnsureItemUnderMouse(int x, int y)

@@ -42,10 +42,24 @@ namespace DndBoard.SeleniumTestsBase
         public void UploadIcon_Works()
         {
             _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
-            _clientHelper.ConnectToBoard("1");
+            _clientHelper.ConnectToBoard(nameof(UploadIcon_Works));
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+
+            _clientHelper.SetCurrentCanvasId("IconsModelsDivCanvas");
+            _clientHelper.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
+        }
+
+        [Fact]
+        public void AddIcon_Works()
+        {
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard(nameof(AddIcon_Works));
 
             _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
             _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+
+            _clientHelper.SetCurrentCanvasId("IconsInstancesCanvasDiv");
             _clientHelper.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
         }
 
@@ -53,7 +67,7 @@ namespace DndBoard.SeleniumTestsBase
         public void MoveIcon_Works()
         {
             _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
-            _clientHelper.ConnectToBoard("2");
+            _clientHelper.ConnectToBoard(nameof(MoveIcon_Works));
 
             _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
             _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
@@ -61,42 +75,172 @@ namespace DndBoard.SeleniumTestsBase
             int moveByX = 250;
             int moveByY = 250;
             _clientHelper.MoveIcon(StartPosMiddleX, StartPosMiddleY, moveByX, moveByY);
+
+            _clientHelper.SetCurrentCanvasId("IconsInstancesCanvasDiv");
             _clientHelper.EnsureItemWasMoved(StartPosMiddleX, StartPosMiddleY, moveByX, moveByY);
         }
 
         [Fact]
-        public void Other_Clients_See_AddedMapIcons()
+        public void DeleteModel_Works()
         {
             _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
-            _clientHelper.ConnectToBoard("3");
+            _clientHelper.ConnectToBoard(nameof(DeleteModel_Works));
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+            _clientHelper.SetCurrentCanvasId("IconsModelsDivCanvas");
+            _clientHelper.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
+
+            _clientHelper.DeleteIconFromCanvas("IconsModelsDivCanvas", StartPosMiddleX, StartPosMiddleY);
+            _clientHelper.SetCurrentCanvasId("IconsModelsDivCanvas");
+            _clientHelper.EnsureIconDeletedFromMap(StartPosMiddleX, StartPosMiddleY);
+        }
+
+        [Fact]
+        public void DeleteInstance_Works()
+        {
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard(nameof(DeleteInstance_Works));
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+            _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+            _clientHelper.SetCurrentCanvasId("IconsInstancesCanvasDiv");
+            _clientHelper.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
+
+            _clientHelper.DeleteIconFromCanvas("IconsInstancesCanvasDiv", StartPosMiddleX, StartPosMiddleY);
+            _clientHelper.SetCurrentCanvasId("IconsInstancesCanvasDiv");
+            _clientHelper.EnsureIconDeletedFromMap(StartPosMiddleX, StartPosMiddleY);
+        }
+
+        [Fact]
+        public void AddingIconInstance_After_DeleteModel_Works()
+        {
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard(nameof(AddingIconInstance_After_DeleteModel_Works));
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+            _clientHelper.DeleteIconFromCanvas("IconsModelsDivCanvas", StartPosMiddleX, StartPosMiddleY);
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+
+            _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+            _clientHelper.SetCurrentCanvasId("IconsInstancesCanvasDiv");
+            _clientHelper.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
+        }
+
+        //[Fact]
+        //public void AddingIconInstance_After_DeleteModel_WithActiveInstances_Works()
+        //{
+        //    _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+        //    _clientHelper.ConnectToBoard(nameof(AddingIconInstance_After_DeleteModel_WithActiveInstances_Works));
+
+        //    _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+        //    _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+        //    _clientHelper.DeleteIconFromCanvas("IconsModelsDivCanvas", StartPosMiddleX, StartPosMiddleY);
+        //    _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+
+        //    _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+        //    _clientHelper.SetCurrentCanvasId("IconsInstancesCanvasDiv");
+        //    _clientHelper.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
+        //}
+
+        [Fact]
+        public void Other_Clients_See_UploadedModels()
+        {
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard(nameof(Other_Clients_See_UploadedModels));
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+
+
+            _clientHelper2.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper2.ConnectToBoard(nameof(Other_Clients_See_UploadedModels));
+            Thread.Sleep(1000);
+
+            _clientHelper2.SetCurrentCanvasId("IconsModelsDivCanvas");
+            _clientHelper2.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
+        }
+
+
+        [Fact]
+        public void Other_Clients_See_AddedIconsInstances()
+        {
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard(nameof(Other_Clients_See_AddedIconsInstances));
 
             _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
             _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
 
 
             _clientHelper2.OpenUrl($"{_siteBaseAddress}/board");
-            _clientHelper2.ConnectToBoard("3");
+            _clientHelper2.ConnectToBoard(nameof(Other_Clients_See_AddedIconsInstances));
             Thread.Sleep(1000);
+
+            _clientHelper2.SetCurrentCanvasId("IconsInstancesCanvasDiv");
             _clientHelper2.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
         }
 
         [Fact]
-        public void Other_Clients_See_MapIconsMovement()
+        public void Other_Clients_See_IconsModelsDeletions()
         {
             _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
-            _clientHelper.ConnectToBoard("4");
+            _clientHelper.ConnectToBoard(nameof(Other_Clients_See_IconsModelsDeletions));
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+
+
+            _clientHelper2.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper2.ConnectToBoard(nameof(Other_Clients_See_IconsModelsDeletions));
+            Thread.Sleep(1000);
+
+            _clientHelper2.SetCurrentCanvasId("IconsModelsDivCanvas");
+            _clientHelper2.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
+
+            _clientHelper.DeleteIconFromCanvas("IconsModelsDivCanvas", StartPosMiddleX, StartPosMiddleY);
+
+            _clientHelper2.SetCurrentCanvasId("IconsModelsDivCanvas");
+            _clientHelper2.EnsureIconDeletedFromMap(StartPosMiddleX, StartPosMiddleY);
+        }
+
+        [Fact]
+        public void Other_Clients_See_IconsInstancesDeletions()
+        {
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard(nameof(Other_Clients_See_IconsInstancesDeletions));
 
             _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
             _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
 
 
             _clientHelper2.OpenUrl($"{_siteBaseAddress}/board");
-            _clientHelper2.ConnectToBoard("4");
+            _clientHelper2.ConnectToBoard(nameof(Other_Clients_See_IconsInstancesDeletions));
+            Thread.Sleep(1000);
+
+            _clientHelper2.SetCurrentCanvasId("IconsInstancesCanvasDiv");
+            _clientHelper2.EnsureIconAddedToMap(StartPosMiddleX, StartPosMiddleY);
+
+            _clientHelper.DeleteIconFromCanvas("IconsInstancesCanvasDiv", StartPosMiddleX, StartPosMiddleY);
+
+            _clientHelper2.SetCurrentCanvasId("IconsInstancesCanvasDiv");
+            _clientHelper2.EnsureIconDeletedFromMap(StartPosMiddleX, StartPosMiddleY);
+        }
+
+        [Fact]
+        public void Other_Clients_See_IconsInstancesMovement()
+        {
+            _clientHelper.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper.ConnectToBoard(nameof(Other_Clients_See_IconsInstancesMovement));
+
+            _clientHelper.UploadIcon($"{_dataDir}/blueSquare.png");
+            _clientHelper.AddIconToMap(StartPosMiddleX, StartPosMiddleY);
+
+
+            _clientHelper2.OpenUrl($"{_siteBaseAddress}/board");
+            _clientHelper2.ConnectToBoard(nameof(Other_Clients_See_IconsInstancesMovement));
 
             int moveByX = 250;
             int moveByY = 250;
             _clientHelper.MoveIcon(StartPosMiddleX, StartPosMiddleY, moveByX, moveByY);
 
+            _clientHelper2.SetCurrentCanvasId("IconsInstancesCanvasDiv");
             _clientHelper2.EnsureItemWasMoved(StartPosMiddleX, StartPosMiddleY, moveByX, moveByY);
         }
     }
