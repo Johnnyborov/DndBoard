@@ -29,13 +29,13 @@ namespace DndBoard.ClientCommon.Components
 
             _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
             _appState.BoardRenderer.RedrawRequestedAsync += Redraw;
+            _appState.ChatHubManager.CoordsChanged += CoordsReceivedHandler;
+            _appState.ChatHubManager.IconInstanceRemoved += IconInstanceRemovedHandler;
         }
 
         private async Task OnBoardIdChangedAsync(string boardId)
         {
-            _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
-            _appState.ChatHubManager.SetIconInstanceRemovedHandler(IconInstanceRemovedHandler);
-            await _appState.ChatHubManager.RequestAllCoordsAsync();
+
         }
 
 

@@ -13,6 +13,13 @@ namespace DndBoard.ClientCommon.Helpers
         private HubConnection _hubConnection;
         private readonly NavigationManager _navigationManager;
 
+        public event ModelsAddedHandlerAsync ModelsAddedAsync;
+        public event ModelDeletedHandler ModelDeleted;
+        public event CoordsChangedHandler CoordsChanged;
+        public event IconInstanceRemovedHandler IconInstanceRemoved;
+        public event ConnectedHandlerAsync ConnectedAsync;
+
+
         public ChatHubManager(NavigationManager navigationManager)
         {
             _navigationManager = navigationManager;
@@ -23,6 +30,15 @@ namespace DndBoard.ClientCommon.Helpers
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(_navigationManager.ToAbsoluteUri(BoardsHubContract.BaseAddress))
                 .Build();
+        }
+
+        public void SetupEventHandlers()
+        {
+            _hubConnection.On(BoardsHubContract.ModelsAdded, (Func<UploadedFiles, Task>)InvokeModelsAddedAsync);
+            _hubConnection.On(BoardsHubContract.ModelDeleted, (Action<string>)InvokeModelDeleted);
+            _hubConnection.On(BoardsHubContract.CoordsChanged, (Action<string>)InvokeCoordsChanged);
+            _hubConnection.On(BoardsHubContract.IconInstanceRemoved, (Action<string>)InvokeIconInstanceRemoved);
+            _hubConnection.On(BoardsHubContract.Connected, (Func<string, Task>)InvokeConnectedAsync);
         }
 
         public async Task StartConnectionAsync() =>
@@ -42,29 +58,15 @@ namespace DndBoard.ClientCommon.Helpers
         public async Task AddModelsAsync(UploadedFiles uploadedFiles) =>
             await _hubConnection.SendAsync(BoardsHubContract.AddModels, uploadedFiles);
 
-        public void SetModelsAddedHandler(Func<UploadedFiles, Task> handler) =>
-            _hubConnection.On(BoardsHubContract.ModelsAdded, handler);
-
-
         public async Task DeleteModelAsync(string modelId) =>
             await _hubConnection.SendAsync(BoardsHubContract.DeleteModel, _boardId, modelId);
-
-        public void SetModelDeletedHandler(Action<string> handler) =>
-            _hubConnection.On(BoardsHubContract.ModelDeleted, handler);
 
 
         public async Task SendCoordsAsync(string coordsChangeDataJson) =>
             await _hubConnection.SendAsync(BoardsHubContract.CoordsChanged, _boardId, coordsChangeDataJson);
 
-        public void SetCoordsReceivedHandler(Action<string> handler) =>
-            _hubConnection.On(BoardsHubContract.CoordsChanged, handler);
-
-
         public async Task SendIconInstanceRemovedAsync(string instanceId) =>
             await _hubConnection.SendAsync(BoardsHubContract.IconInstanceRemoved, _boardId, instanceId);
-
-        public void SetIconInstanceRemovedHandler(Action<string> handler) =>
-            _hubConnection.On(BoardsHubContract.IconInstanceRemoved, handler);
 
 
         public async Task ConnectAsync(string boardId)
@@ -73,7 +75,35 @@ namespace DndBoard.ClientCommon.Helpers
             await _hubConnection.SendAsync(BoardsHubContract.Connect, _boardId);
         }
 
-        public void SetConnectedHandler(Func<string, Task> handler) =>
-            _hubConnection.On(BoardsHubContract.Connected, handler);
+
+        private async Task InvokeModelsAddedAsync(UploadedFiles uploadedFiles)
+        {
+            if (ModelsAddedAsync is not null)
+                await ModelsAddedAsync.Invoke(uploadedFiles);
+        }
+
+        private void InvokeModelDeleted(string modelId)
+        {
+            if (ModelDeleted is not null)
+                ModelDeleted.Invoke(modelId);
+        }
+
+        private void InvokeCoordsChanged(string coordsChangeDataJson)
+        {
+            if (CoordsChanged is not null)
+                CoordsChanged.Invoke(coordsChangeDataJson);
+        }
+
+        private void InvokeIconInstanceRemoved(string iconInstanceId)
+        {
+            if (IconInstanceRemoved is not null)
+                IconInstanceRemoved.Invoke(iconInstanceId);
+        }
+
+        private async Task InvokeConnectedAsync(string boardId)
+        {
+            if (ConnectedAsync is not null)
+                await ConnectedAsync.Invoke(boardId);
+        }
     }
 }

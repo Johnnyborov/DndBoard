@@ -92,7 +92,6 @@ namespace DndBoard.ClientCommon.Components
             };
             string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
             await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
-            await _appState.InvokeFilesRefsChangedAsync();
         }
 
         private DndIconElem GetClickedIcon(Coords coords)
@@ -119,17 +118,22 @@ namespace DndBoard.ClientCommon.Components
 
             _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
             _appState.BoardRenderer.RedrawRequestedAsync += RedrawAsync;
+            _appState.ChatHubManager.ModelsAddedAsync += OnModelAddedAsync;
+            _appState.ChatHubManager.ModelDeleted += OnModelDeletedAsync;
         }
 
         private async Task OnModelAddedAsync(UploadedFiles uploadedFiles)
         {
             List<DndIconElem> newModels = await CreateNewIconsModelsAsync(uploadedFiles);
 
-            _appState.IconsModels.AddRange(newModels);
+            newModels.RemoveAll(x => _appState.IconsModels.Any(y => y.ModelId == x.ModelId));
+            _appState.IconsModels.AddRange(newModels.Except(_appState.IconsModels));
+
             for (int i = 0; i < _appState.IconsModels.Count; i++)
                 _appState.IconsModels[i].Coords = new Coords { X = 50, Y = 50 + i * 110 };
 
             StateHasChanged();
+            await _appState.ChatHubManager.RequestAllCoordsAsync();
         }
 
         private async Task<List<DndIconElem>> CreateNewIconsModelsAsync(UploadedFiles uploadedFiles)
@@ -184,8 +188,6 @@ namespace DndBoard.ClientCommon.Components
         {
             _boardId = boardId;
             StateHasChanged();
-            _appState.ChatHubManager.SetModelsAddedHandler(OnModelAddedAsync);
-            _appState.ChatHubManager.SetModelDeletedHandler(OnModelDeletedAsync);
             await _appState.ChatHubManager.RequestAllModelsAsync();
         }
     }

@@ -30,9 +30,10 @@ namespace DndBoard.ClientCommon.Components
 
             await _boardRenderer.InitializeAsync();
 
+            _chatHubManager.ConnectedAsync += ConnectedHanlderAsync;
             _chatHubManager.SetupConnectionAsync();
-            _chatHubManager.SetConnectedHandler(ConnectedHanlderAsync);
             await _chatHubManager.StartConnectionAsync();
+            _chatHubManager.SetupEventHandlers();
         }
 
         public async ValueTask DisposeAsync()

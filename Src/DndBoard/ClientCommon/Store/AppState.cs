@@ -12,15 +12,8 @@ namespace DndBoard.ClientCommon.Store
         public List<DndIconElem> IconsInstances { get; set; }
         public List<DndIconElem> IconsModels { get; set; }
 
-        public event FilesRefsChangedHandlerAsync FilesRefsChangedAsync;
         public event BoardIdChangedHandlerAsync BoardIdChangedAsync;
 
-
-        public async Task InvokeFilesRefsChangedAsync()
-        {
-            if (FilesRefsChangedAsync is not null)
-                await FilesRefsChangedAsync.Invoke();
-        }
 
         public async Task InvokeBoardIdChangedAsync(string boardId)
         {
