@@ -27,7 +27,7 @@ namespace DndBoard.BlazorServer
         {
             services.AddScoped<BoardRenderer>();
             services.AddTransient<CanvasMapRenderer>();
-            services.AddTransient<ChatHubManager>();
+            services.AddTransient<BoardHubManager>();
             services.AddScoped<AppState>();
 
             services.AddTransient<BoardsManager>();

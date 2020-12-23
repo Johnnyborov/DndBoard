@@ -64,7 +64,7 @@ namespace DndBoard.ClientCommon.Components
             uploadedFiles.BoardId = _boardId;
             uploadedFiles.Files = files.ToArray();
 
-            await _appState.ChatHubManager.AddModelsAsync(uploadedFiles);
+            await _appState.BoardHubManager.AddModelsAsync(uploadedFiles);
         }
 
         private async Task OnRightClickAsync(MouseEventArgs mouseEventArgs)
@@ -74,7 +74,7 @@ namespace DndBoard.ClientCommon.Components
             if (clickedIcon is null)
                 return;
 
-            await _appState.ChatHubManager.DeleteModelAsync(clickedIcon.ModelId);
+            await _appState.BoardHubManager.DeleteModelAsync(clickedIcon.ModelId);
         }
 
         private async Task OnClickAsync(MouseEventArgs mouseEventArgs)
@@ -91,7 +91,7 @@ namespace DndBoard.ClientCommon.Components
                 ModelId = clickedIcon.ModelId,
             };
             string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
-            await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
+            await _appState.BoardHubManager.SendCoordsAsync(coordsChangeDataJson);
         }
 
         private DndIconElem GetClickedIcon(Coords coords)
@@ -118,8 +118,8 @@ namespace DndBoard.ClientCommon.Components
 
             _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
             _appState.BoardRenderer.RedrawRequestedAsync += OnRedrawAsync;
-            _appState.ChatHubManager.ModelsAddedAsync += OnModelAddedAsync;
-            _appState.ChatHubManager.ModelDeleted += OnModelDeletedAsync;
+            _appState.BoardHubManager.ModelsAddedAsync += OnModelAddedAsync;
+            _appState.BoardHubManager.ModelDeleted += OnModelDeletedAsync;
         }
 
         private async Task OnModelAddedAsync(UploadedFiles uploadedFiles)
@@ -188,7 +188,7 @@ namespace DndBoard.ClientCommon.Components
         {
             _boardId = boardId;
             StateHasChanged();
-            await _appState.ChatHubManager.RequestAllModelsAsync();
+            await _appState.BoardHubManager.RequestAllModelsAsync();
         }
     }
 }

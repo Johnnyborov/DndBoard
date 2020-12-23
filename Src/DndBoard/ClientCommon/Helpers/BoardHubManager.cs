@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace DndBoard.ClientCommon.Helpers
 {
-    public class ChatHubManager
+    public class BoardHubManager
     {
         private string _boardId;
         private HubConnection _hubConnection;
@@ -20,7 +20,7 @@ namespace DndBoard.ClientCommon.Helpers
         public event ConnectedHandlerAsync ConnectedAsync;
 
 
-        public ChatHubManager(NavigationManager navigationManager)
+        public BoardHubManager(NavigationManager navigationManager)
         {
             _navigationManager = navigationManager;
         }

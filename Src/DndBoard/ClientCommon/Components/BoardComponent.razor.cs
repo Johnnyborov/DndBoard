@@ -13,7 +13,7 @@ namespace DndBoard.ClientCommon.Components
         private string _boardId;
         private string _connectedBoardId;
         [Inject] private BoardRenderer _boardRenderer { get; set; }
-        [Inject] private ChatHubManager _chatHubManager { get; set; }
+        [Inject] private BoardHubManager _boardHubManager { get; set; }
         [Inject] private AppState _appState { get; set; }
 
 
@@ -26,25 +26,25 @@ namespace DndBoard.ClientCommon.Components
                 _initialized = true;
 
             _appState.BoardRenderer = _boardRenderer;
-            _appState.ChatHubManager = _chatHubManager;
+            _appState.BoardHubManager = _boardHubManager;
 
             await _boardRenderer.InitializeAsync();
 
-            _chatHubManager.ConnectedAsync += OnConnectedAsync;
-            _chatHubManager.SetupConnectionAsync();
-            await _chatHubManager.StartConnectionAsync();
-            _chatHubManager.SetupEventHandlers();
+            _boardHubManager.ConnectedAsync += OnConnectedAsync;
+            _boardHubManager.SetupConnectionAsync();
+            await _boardHubManager.StartConnectionAsync();
+            _boardHubManager.SetupEventHandlers();
         }
 
         public async ValueTask DisposeAsync()
         {
-            await _chatHubManager.CloseConnectionAsync();
+            await _boardHubManager.CloseConnectionAsync();
         }
 
 
         private async Task ConnectAsync()
         {
-            await _chatHubManager.ConnectAsync(_boardId);
+            await _boardHubManager.ConnectAsync(_boardId);
         }
 
         private async Task OnConnectedAsync(string boardId)

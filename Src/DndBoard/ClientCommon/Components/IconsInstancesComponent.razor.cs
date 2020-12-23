@@ -29,13 +29,13 @@ namespace DndBoard.ClientCommon.Components
 
             _appState.AllModelsLoadedAsync += OnAllModelsLoadedAsync;
             _appState.BoardRenderer.RedrawRequestedAsync += OnRedrawAsync;
-            _appState.ChatHubManager.CoordsChanged += OnCoordsReceived;
-            _appState.ChatHubManager.IconInstanceRemoved += OnIconInstanceRemoved;
+            _appState.BoardHubManager.CoordsChanged += OnCoordsReceived;
+            _appState.BoardHubManager.IconInstanceRemoved += OnIconInstanceRemoved;
         }
 
         private async Task OnAllModelsLoadedAsync()
         {
-            await _appState.ChatHubManager.RequestAllCoordsAsync();
+            await _appState.BoardHubManager.RequestAllCoordsAsync();
         }
 
 
@@ -92,7 +92,7 @@ namespace DndBoard.ClientCommon.Components
                     ModelId = clickedIcon.ModelId,
                 };
                 string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
-                await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
+                await _appState.BoardHubManager.SendCoordsAsync(coordsChangeDataJson);
             }
         }
 
@@ -126,7 +126,7 @@ namespace DndBoard.ClientCommon.Components
         {
             DndIconElem clickedIcon = await GetClickedIcon(mouseEventArgs);
             if (clickedIcon is not null)
-                await _appState.ChatHubManager.SendIconInstanceRemovedAsync(clickedIcon.InstanceId);
+                await _appState.BoardHubManager.SendIconInstanceRemovedAsync(clickedIcon.InstanceId);
         }
     }
 }

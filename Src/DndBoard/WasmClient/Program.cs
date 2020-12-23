@@ -20,7 +20,7 @@ namespace DndBoard.WasmClient
             
             builder.Services.AddScoped<BoardRenderer>();
             builder.Services.AddTransient<CanvasMapRenderer>();
-            builder.Services.AddTransient<ChatHubManager>();
+            builder.Services.AddTransient<BoardHubManager>();
             builder.Services.AddScoped<AppState>();
 
             await builder.Build().RunAsync();

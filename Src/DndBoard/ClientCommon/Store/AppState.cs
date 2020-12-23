@@ -8,7 +8,7 @@ namespace DndBoard.ClientCommon.Store
     public class AppState
     {
         public BoardRenderer BoardRenderer { get; set; }
-        public ChatHubManager ChatHubManager { get; set; }
+        public BoardHubManager BoardHubManager { get; set; }
         public List<DndIconElem> IconsInstances { get; set; }
         public List<DndIconElem> IconsModels { get; set; }
 
