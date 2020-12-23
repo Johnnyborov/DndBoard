@@ -8,8 +8,16 @@ function getElementOffsets(el) {
 }
 
 
+function createFileURLUnmarshalled(fileContent) {
+    var bytes = Blazor.platform.toUint8Array(fileContent);
+    var blob = new Blob([bytes], { type: 'image/png' });
+    var url = URL.createObjectURL(blob);
+    return BINDING.js_string_to_mono_string(url);
+}
+
 function createFileURL(fileContent) {
-    var blob = new Blob([base64ToArrayBuffer(fileContent)], { type: 'image/png' });
+    var bytes = base64ToArrayBuffer(fileContent);
+    var blob = new Blob([bytes], { type: 'image/png' });
     var url = URL.createObjectURL(blob);
     return url;
 }

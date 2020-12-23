@@ -102,6 +102,9 @@ namespace DndBoard.ClientCommon.Components
 
         private async Task<DndIconElem> GetClickedIcon(MouseEventArgs mouseEventArgs)
         {
+            if (_appState.IconsModels is null)
+                return null;
+
             Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
 
             foreach (DndIconElem icon in _appState.IconsInstances)

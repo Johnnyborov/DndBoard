@@ -121,18 +121,7 @@ namespace DndBoard.ClientCommon.Components
 
         private async Task OnModelAdded(UploadedFiles uploadedFiles)
         {
-            List<Task<DndIconElem>> newModelsTasks = uploadedFiles.Files
-                .Select(async file =>
-                {
-                    string url = await _jsRuntime.InvokeAsync<string>(
-                        "createFileURL", file.FileContent
-                    );
-
-                    return new DndIconElem { ModelId = file.FileName, Url = url };
-                }).ToList();
-
-            await Task.WhenAll(newModelsTasks);
-            List<DndIconElem> newModels = newModelsTasks.Select(task => task.Result).ToList();
+            List<DndIconElem> newModels = await CreateNewIconsModels(uploadedFiles);
 
             _appState.IconsModels.AddRange(newModels);
             for (int i = 0; i < _appState.IconsModels.Count; i++)
@@ -140,6 +129,41 @@ namespace DndBoard.ClientCommon.Components
 
             StateHasChanged();
             await _appState.ChatHubManager.RequestAllCoords();
+        }
+
+        private async Task<List<DndIconElem>> CreateNewIconsModels(UploadedFiles uploadedFiles)
+        {
+            List<DndIconElem> newModels;
+
+            if (_jsRuntime is IJSUnmarshalledRuntime jsUnmarshalledRuntime)
+            {
+                newModels = uploadedFiles.Files
+                    .Select(file =>
+                    {
+                        string url = jsUnmarshalledRuntime.InvokeUnmarshalled<byte[], string>(
+                            "createFileURLUnmarshalled", file.FileContent
+                        );
+
+                        return new DndIconElem { ModelId = file.FileName, Url = url };
+                    }).ToList();
+            }
+            else
+            {
+                List<Task<DndIconElem>> newModelsTasks = uploadedFiles.Files
+                    .Select(async file =>
+                    {
+                        string url = await _jsRuntime.InvokeAsync<string>(
+                            "createFileURL", file.FileContent
+                        );
+
+                        return new DndIconElem { ModelId = file.FileName, Url = url };
+                    }).ToList();
+
+                await Task.WhenAll(newModelsTasks);
+                newModels = newModelsTasks.Select(task => task.Result).ToList();
+            }
+
+            return newModels;
         }
 
         [JSInvokable]
