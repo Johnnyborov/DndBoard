@@ -4,7 +4,7 @@
 
 @_boardId
 <p>
-    <InputFile OnChange="@OnInputFileChange" multiple />
+    <InputFile OnChange="@OnInputFileChangeAsync" multiple />
 </p>
 
 @foreach (var icon in _appState.IconsModels)
@@ -16,8 +16,8 @@
     <div
         id="IconsModelsDivCanvas"
         @ref="DivCanvas"
-        @onclick="OnClick"
-        @oncontextmenu="OnRightClick"
+        @onclick="OnClickAsync"
+        @oncontextmenu="OnRightClickAsync"
         @oncontextmenu:preventDefault="true"
         style="background-color: yellow"
     >

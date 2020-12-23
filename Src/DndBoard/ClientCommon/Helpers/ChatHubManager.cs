@@ -32,21 +32,21 @@ namespace DndBoard.ClientCommon.Helpers
             await _hubConnection.DisposeAsync();
 
 
-        public async Task RequestAllModels() =>
+        public async Task RequestAllModelsAsync() =>
             await _hubConnection.SendAsync(BoardsHubContract.RequestAllModels, _boardId);
 
-        public async Task RequestAllCoords() =>
+        public async Task RequestAllCoordsAsync() =>
             await _hubConnection.SendAsync(BoardsHubContract.RequestAllCoords, _boardId);
 
 
-        public async Task AddModels(UploadedFiles uploadedFiles) =>
+        public async Task AddModelsAsync(UploadedFiles uploadedFiles) =>
             await _hubConnection.SendAsync(BoardsHubContract.AddModels, uploadedFiles);
 
         public void SetModelsAddedHandler(Func<UploadedFiles, Task> handler) =>
             _hubConnection.On(BoardsHubContract.ModelsAdded, handler);
 
 
-        public async Task DeleteModel(string fileId) =>
+        public async Task DeleteModelAsync(string fileId) =>
             await _hubConnection.SendAsync(BoardsHubContract.DeleteModel, _boardId, fileId);
 
         public void SetModelDeletedHandler(Action<string> handler) =>
@@ -60,7 +60,7 @@ namespace DndBoard.ClientCommon.Helpers
             _hubConnection.On(BoardsHubContract.CoordsChanged, handler);
 
 
-        public async Task SendIconInstanceRemoved(string instanceId) =>
+        public async Task SendIconInstanceRemovedAsync(string instanceId) =>
             await _hubConnection.SendAsync(BoardsHubContract.IconInstanceRemoved, _boardId, instanceId);
 
         public void SetIconInstanceRemovedHandler(Action<string> handler) =>

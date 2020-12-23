@@ -2,7 +2,7 @@
 
 namespace DndBoard.ClientCommon
 {
-    public delegate Task RedrawRequestedHandler();
-    public delegate Task FilesRefsChangedHandler();
-    public delegate Task BoardIdChangedHandler(string boardId);
+    public delegate Task RedrawRequestedHandlerAsync();
+    public delegate Task FilesRefsChangedHandlerAsync();
+    public delegate Task BoardIdChangedHandlerAsync(string boardId);
 }

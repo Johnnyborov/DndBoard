@@ -24,21 +24,21 @@ namespace DndBoard.ClientCommon.Components
         [Inject] private IJSRuntime _jsRuntime { get; set; }
 
 
-        private async Task OnInputFileChange(InputFileChangeEventArgs e)
+        private async Task OnInputFileChangeAsync(InputFileChangeEventArgs e)
         {
             int maxAllowedFiles = 777;
 
             List<UploadedFile> files = new();
             foreach (IBrowserFile imageFile in e.GetMultipleFiles(maxAllowedFiles))
             {
-                UploadedFile uploadedFile = await ConvertToUploadedFile(imageFile);
+                UploadedFile uploadedFile = await ConvertToUploadedFileAsync(imageFile);
                 files.Add(uploadedFile);
             }
 
-            await SendFilesToServer(files);
+            await SendFilesToServerAsync(files);
         }
 
-        private static async Task<UploadedFile> ConvertToUploadedFile(IBrowserFile imageFile)
+        private static async Task<UploadedFile> ConvertToUploadedFileAsync(IBrowserFile imageFile)
         {
             string format = "image/png";
 
@@ -58,26 +58,26 @@ namespace DndBoard.ClientCommon.Components
             return uploadedFile;
         }
 
-        private async Task SendFilesToServer(List<UploadedFile> files)
+        private async Task SendFilesToServerAsync(List<UploadedFile> files)
         {
             UploadedFiles uploadedFiles = new();
             uploadedFiles.BoardId = _boardId;
             uploadedFiles.Files = files.ToArray();
 
-            await _appState.ChatHubManager.AddModels(uploadedFiles);
+            await _appState.ChatHubManager.AddModelsAsync(uploadedFiles);
         }
 
-        private async Task OnRightClick(MouseEventArgs mouseEventArgs)
+        private async Task OnRightClickAsync(MouseEventArgs mouseEventArgs)
         {
             Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
             DndIconElem clickedIcon = GetClickedIcon(coords);
             if (clickedIcon is null)
                 return;
 
-            await _appState.ChatHubManager.DeleteModel(clickedIcon.InstanceId);
+            await _appState.ChatHubManager.DeleteModelAsync(clickedIcon.InstanceId);
         }
 
-        private async Task OnClick(MouseEventArgs mouseEventArgs)
+        private async Task OnClickAsync(MouseEventArgs mouseEventArgs)
         {
             Coords coords = await GetCanvasCoordinatesAsync(mouseEventArgs);
             DndIconElem clickedIcon = GetClickedIcon(coords);
@@ -92,7 +92,7 @@ namespace DndBoard.ClientCommon.Components
             };
             string coordsChangeDataJson = JsonSerializer.Serialize(coordsChangeData);
             await _appState.ChatHubManager.SendCoordsAsync(coordsChangeDataJson);
-            await _appState.InvokeFilesRefsChanged();
+            await _appState.InvokeFilesRefsChangedAsync();
         }
 
         private DndIconElem GetClickedIcon(Coords coords)
@@ -117,24 +117,24 @@ namespace DndBoard.ClientCommon.Components
             else
                 _initialized = true;
 
-            _appState.BoardIdChanged += OnBoardIdChanged;
-            _appState.ChatHubManager.SetModelsAddedHandler(OnModelAdded);
-            _appState.BoardRenderer.RedrawRequested += Redraw;
+            _appState.BoardIdChangedAsync += OnBoardIdChangedAsync;
+            _appState.ChatHubManager.SetModelsAddedHandler(OnModelAddedAsync);
+            _appState.BoardRenderer.RedrawRequestedAsync += RedrawAsync;
         }
 
-        private async Task OnModelAdded(UploadedFiles uploadedFiles)
+        private async Task OnModelAddedAsync(UploadedFiles uploadedFiles)
         {
-            List<DndIconElem> newModels = await CreateNewIconsModels(uploadedFiles);
+            List<DndIconElem> newModels = await CreateNewIconsModelsAsync(uploadedFiles);
 
             _appState.IconsModels.AddRange(newModels);
             for (int i = 0; i < _appState.IconsModels.Count; i++)
                 _appState.IconsModels[i].Coords = new Coords { X = 50, Y = 50 + i * 110 };
 
             StateHasChanged();
-            await _appState.ChatHubManager.RequestAllCoords();
+            await _appState.ChatHubManager.RequestAllCoordsAsync();
         }
 
-        private async Task<List<DndIconElem>> CreateNewIconsModels(UploadedFiles uploadedFiles)
+        private async Task<List<DndIconElem>> CreateNewIconsModelsAsync(UploadedFiles uploadedFiles)
         {
             List<DndIconElem> newModels;
 
@@ -169,19 +169,19 @@ namespace DndBoard.ClientCommon.Components
             return newModels;
         }
 
-        private async Task Redraw()
+        private async Task RedrawAsync()
         {
             if (_appState.IconsModels is null)
                 return;
 
-            await _canvasMapRenderer.RedrawIconsByCoordsJS("IconsModelsDivCanvas", _jsRuntime, _appState.IconsModels);
+            await _canvasMapRenderer.RedrawIconsByCoordsAsync("IconsModelsDivCanvas", _jsRuntime, _appState.IconsModels);
         }
 
-        private async Task OnBoardIdChanged(string boardId)
+        private async Task OnBoardIdChangedAsync(string boardId)
         {
             _boardId = boardId;
             StateHasChanged();
-            await _appState.ChatHubManager.RequestAllModels();
+            await _appState.ChatHubManager.RequestAllModelsAsync();
         }
     }
 }

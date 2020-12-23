@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Blazor.Extensions;
-using Blazor.Extensions.Canvas.Canvas2D;
 using DndBoard.ClientCommon.Models;
-using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace DndBoard.ClientCommon.Helpers
@@ -15,10 +11,8 @@ namespace DndBoard.ClientCommon.Helpers
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
 
-        public async Task RedrawIconsByCoordsJS(
-            string divCanvasId,
-            IJSRuntime jsRuntime,
-            List<DndIconElem> icons)
+        public async Task RedrawIconsByCoordsAsync(
+            string divCanvasId, IJSRuntime jsRuntime, List<DndIconElem> icons)
         {
             await _semaphore.WaitAsync();
             try

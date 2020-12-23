@@ -38,7 +38,7 @@ function initBoardRendererInstance(instance) {
     window.requestAnimationFrame(redraw);
 }
 function redraw() {
-    boardRendererInstance.invokeMethodAsync('Redraw');
+    boardRendererInstance.invokeMethodAsync('RedrawAsync');
     window.requestAnimationFrame(redraw);
 }
 

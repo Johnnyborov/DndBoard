@@ -27,8 +27,8 @@ namespace DndBoard.ClientCommon.Components
             else
                 _initialized = true;
 
-            _appState.BoardIdChanged += OnBoardIdChanged;
-            _appState.BoardRenderer.RedrawRequested += Redraw;
+            _appState.BoardIdChangedAsync += OnBoardIdChanged;
+            _appState.BoardRenderer.RedrawRequestedAsync += Redraw;
         }
 
         private Task OnBoardIdChanged(string boardId)
@@ -73,7 +73,7 @@ namespace DndBoard.ClientCommon.Components
             if (_appState.IconsInstances is null)
                 return;
 
-            await _canvasMapRenderer.RedrawIconsByCoordsJS("IconsInstancesCanvasDiv", _jsRuntime, _appState.IconsInstances);
+            await _canvasMapRenderer.RedrawIconsByCoordsAsync("IconsInstancesCanvasDiv", _jsRuntime, _appState.IconsInstances);
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
@@ -126,7 +126,7 @@ namespace DndBoard.ClientCommon.Components
         {
             DndIconElem clickedIcon = await GetClickedIcon(mouseEventArgs);
             if (clickedIcon is not null)
-                await _appState.ChatHubManager.SendIconInstanceRemoved(clickedIcon.InstanceId);
+                await _appState.ChatHubManager.SendIconInstanceRemovedAsync(clickedIcon.InstanceId);
         }
     }
 }

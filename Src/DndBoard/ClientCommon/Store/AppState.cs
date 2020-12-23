@@ -12,20 +12,20 @@ namespace DndBoard.ClientCommon.Store
         public List<DndIconElem> IconsInstances { get; set; }
         public List<DndIconElem> IconsModels { get; set; }
 
-        public event FilesRefsChangedHandler FilesRefsChanged;
-        public event BoardIdChangedHandler BoardIdChanged;
+        public event FilesRefsChangedHandlerAsync FilesRefsChangedAsync;
+        public event BoardIdChangedHandlerAsync BoardIdChangedAsync;
 
 
-        public async Task InvokeFilesRefsChanged()
+        public async Task InvokeFilesRefsChangedAsync()
         {
-            if (FilesRefsChanged is not null)
-                await FilesRefsChanged.Invoke();
+            if (FilesRefsChangedAsync is not null)
+                await FilesRefsChangedAsync.Invoke();
         }
 
-        public async Task InvokeBoardIdChanged(string boardId)
+        public async Task InvokeBoardIdChangedAsync(string boardId)
         {
-            if (BoardIdChanged is not null)
-                await BoardIdChanged.Invoke(boardId);
+            if (BoardIdChangedAsync is not null)
+                await BoardIdChangedAsync.Invoke(boardId);
         }
     }
 }

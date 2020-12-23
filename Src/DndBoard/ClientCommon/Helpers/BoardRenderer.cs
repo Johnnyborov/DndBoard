@@ -8,7 +8,7 @@ namespace DndBoard.ClientCommon.Helpers
     {
         private IJSRuntime _jsRuntime;
 
-        public event RedrawRequestedHandler RedrawRequested;
+        public event RedrawRequestedHandlerAsync RedrawRequestedAsync;
 
 
         public BoardRenderer(IJSRuntime jsRuntime)
@@ -17,7 +17,7 @@ namespace DndBoard.ClientCommon.Helpers
         }
 
 
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
             await _jsRuntime.InvokeVoidAsync(
                 "initBoardRendererInstance", DotNetObjectReference.Create(this)
@@ -25,10 +25,10 @@ namespace DndBoard.ClientCommon.Helpers
         }
 
         [JSInvokable]
-        public async Task Redraw()
+        public async Task RedrawAsync()
         {
-            if (RedrawRequested is not null)
-                await RedrawRequested.Invoke();
+            if (RedrawRequestedAsync is not null)
+                await RedrawRequestedAsync.Invoke();
         }
     }
 }
