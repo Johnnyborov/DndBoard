@@ -12,16 +12,27 @@ namespace DndBoard.ClientCommon.Components
     {
         private string _boardId;
         private string _connectedBoardId;
+        [Inject] private BoardRenderer _boardRenderer { get; set; }
         [Inject] private ChatHubManager _chatHubManager { get; set; }
         [Inject] private AppState _appState { get; set; }
 
 
+        private bool _initialized = false;
         protected override async Task OnInitializedAsync()
         {
+            if (_initialized)
+                return;
+            else
+                _initialized = true;
+
+            _appState.BoardRenderer = _boardRenderer;
+            _appState.ChatHubManager = _chatHubManager;
+
+            await _boardRenderer.Initialize();
+
             _chatHubManager.SetupConnectionAsync();
             _chatHubManager.SetConnectedHandler(ConnectedHanlder);
             await _chatHubManager.StartConnectionAsync();
-            _appState.ChatHubManager = _chatHubManager;
         }
 
         public async ValueTask DisposeAsync()

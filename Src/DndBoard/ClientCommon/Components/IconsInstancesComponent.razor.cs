@@ -20,7 +20,7 @@ namespace DndBoard.ClientCommon.Components
 
 
         private bool _initialized = false;
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             if (_initialized)
                 return;
@@ -28,10 +28,7 @@ namespace DndBoard.ClientCommon.Components
                 _initialized = true;
 
             _appState.BoardIdChanged += OnBoardIdChanged;
-
-            await _jsRuntime.InvokeAsync<object>(
-                "initIconsInstancesComponent", DotNetObjectReference.Create(this)
-            );
+            _appState.BoardRenderer.RedrawRequested += Redraw;
         }
 
         private Task OnBoardIdChanged(string boardId)
@@ -71,8 +68,7 @@ namespace DndBoard.ClientCommon.Components
             }
         }
 
-        [JSInvokable]
-        public async Task Redraw()
+        private async Task Redraw()
         {
             if (_appState.IconsInstances is null)
                 return;

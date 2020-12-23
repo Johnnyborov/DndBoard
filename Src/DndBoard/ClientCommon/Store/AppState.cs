@@ -7,19 +7,25 @@ namespace DndBoard.ClientCommon.Store
 {
     public class AppState
     {
-        public ChatHubManager ChatHubManager;
-        public List<DndIconElem> IconsInstances;
-        public List<DndIconElem> IconsModels;
+        public BoardRenderer BoardRenderer { get; set; }
+        public ChatHubManager ChatHubManager { get; set; }
+        public List<DndIconElem> IconsInstances { get; set; }
+        public List<DndIconElem> IconsModels { get; set; }
 
         public event FilesRefsChangedHandler FilesRefsChanged;
         public event BoardIdChangedHandler BoardIdChanged;
 
+
         public async Task InvokeFilesRefsChanged()
-        { // null conditional operator doesn't work. GG.
+        {
             if (FilesRefsChanged is not null)
                 await FilesRefsChanged.Invoke();
         }
+
         public async Task InvokeBoardIdChanged(string boardId)
-            => await BoardIdChanged?.Invoke(boardId);
+        {
+            if (BoardIdChanged is not null)
+                await BoardIdChanged.Invoke(boardId);
+        }
     }
 }

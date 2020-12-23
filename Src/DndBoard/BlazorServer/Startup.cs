@@ -25,6 +25,7 @@ namespace DndBoard.BlazorServer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<BoardRenderer>();
             services.AddTransient<CanvasMapRenderer>();
             services.AddTransient<ChatHubManager>();
             services.AddScoped<AppState>();

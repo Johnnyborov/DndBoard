@@ -109,14 +109,17 @@ namespace DndBoard.ClientCommon.Components
             return null;
         }
 
-        protected override async Task OnInitializedAsync()
+        private bool _initialized = false;
+        protected override void OnInitialized()
         {
+            if (_initialized)
+                return;
+            else
+                _initialized = true;
+
             _appState.BoardIdChanged += OnBoardIdChanged;
             _appState.ChatHubManager.SetModelsAddedHandler(OnModelAdded);
-
-            await _jsRuntime.InvokeAsync<object>(
-                "initIconsModelsComponent", DotNetObjectReference.Create(this)
-            );
+            _appState.BoardRenderer.RedrawRequested += Redraw;
         }
 
         private async Task OnModelAdded(UploadedFiles uploadedFiles)
@@ -166,8 +169,7 @@ namespace DndBoard.ClientCommon.Components
             return newModels;
         }
 
-        [JSInvokable]
-        public async Task Redraw()
+        private async Task Redraw()
         {
             if (_appState.IconsModels is null)
                 return;

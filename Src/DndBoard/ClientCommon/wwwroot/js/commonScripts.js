@@ -14,14 +14,12 @@ function createFileURLUnmarshalled(fileContent) {
     var url = URL.createObjectURL(blob);
     return BINDING.js_string_to_mono_string(url);
 }
-
 function createFileURL(fileContent) {
     var bytes = base64ToArrayBuffer(fileContent);
     var blob = new Blob([bytes], { type: 'image/png' });
     var url = URL.createObjectURL(blob);
     return url;
 }
-
 function base64ToArrayBuffer(base64) {
     var binaryString = window.atob(base64);
     var binaryLen = binaryString.length;
@@ -34,19 +32,13 @@ function base64ToArrayBuffer(base64) {
 }
 
 
-var iconsInstancesComponentInstance;
-function initIconsInstancesComponent(instance) {
-    iconsInstancesComponentInstance = instance;
-    window.requestAnimationFrame(redraw);
-}
-var iconsModelsComponentInstance;
-function initIconsModelsComponent(instance) {
-    iconsModelsComponentInstance = instance;
+var boardRendererInstance;
+function initBoardRendererInstance(instance) {
+    boardRendererInstance = instance;
     window.requestAnimationFrame(redraw);
 }
 function redraw() {
-    iconsInstancesComponentInstance.invokeMethodAsync('Redraw');
-    iconsModelsComponentInstance.invokeMethodAsync('Redraw');
+    boardRendererInstance.invokeMethodAsync('Redraw');
     window.requestAnimationFrame(redraw);
 }
 

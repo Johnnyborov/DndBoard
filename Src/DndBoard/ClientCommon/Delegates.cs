@@ -2,6 +2,7 @@
 
 namespace DndBoard.ClientCommon
 {
+    public delegate Task RedrawRequestedHandler();
     public delegate Task FilesRefsChangedHandler();
     public delegate Task BoardIdChangedHandler(string boardId);
 }
