@@ -25,7 +25,6 @@ namespace DndBoard.WasmServer
         {
             services.AddTransient<BoardsManager>();
             services.AddSignalR();
-            services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddResponseCompression(opts =>
             {
@@ -60,7 +59,6 @@ namespace DndBoard.WasmServer
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                endpoints.MapControllers();
                 endpoints.MapHub<BoardsHub>(BoardsHubContract.BaseAddress);
                 endpoints.MapFallbackToFile("index.html");
             });

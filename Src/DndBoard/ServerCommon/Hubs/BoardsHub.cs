@@ -16,12 +16,22 @@ namespace DndBoard.ServerCommon.Hubs
             _boardsManager = boardsManager;
         }
 
-        [HubMethodName(BoardsHubContract.IconInstanceRemoved)]
-        public async Task SendIconInstanceRemoved(string boardId, string imageId)
+
+        [HubMethodName(BoardsHubContract.RequestAllModels)]
+        public async Task RequestAllModels(string boardId)
         {
             Board board = _boardsManager.GetBoard(boardId);
-            board.IconsInstances.RemoveAll(img => img.InstanceId == imageId);
-            await Clients.Group(boardId).SendAsync(BoardsHubContract.IconInstanceRemoved, imageId);
+            foreach (DndIcon icon in board.IconsInstances)
+            {
+                byte[] model = board.GetFile(icon.ModelId);
+                UploadedFiles uploadedFiles = new UploadedFiles();
+                uploadedFiles.BoardId = boardId;
+                uploadedFiles.Files = new UploadedFile[]
+                {
+                    new UploadedFile { FileName = icon.ModelId, FileContent = model }
+                };
+                await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelsAdded, uploadedFiles);
+            }
         }
 
         [HubMethodName(BoardsHubContract.RequestAllCoords)]
@@ -41,6 +51,28 @@ namespace DndBoard.ServerCommon.Hubs
                 await Clients.Caller.SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
             }
         }
+
+
+        [HubMethodName(BoardsHubContract.AddModels)]
+        public async Task AddModels(UploadedFiles uploadedFiles)
+        {
+            string boardId = uploadedFiles.BoardId;
+            Board board = _boardsManager.GetBoard(boardId);
+
+            foreach (UploadedFile file in uploadedFiles.Files)
+                file.FileName = board.AddFile(file.FileContent);
+
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelsAdded, uploadedFiles);
+        }
+
+        [HubMethodName(BoardsHubContract.DeleteModel)]
+        public async Task DeleteModel(string boardId, string fileId)
+        {
+            Board board = _boardsManager.GetBoard(boardId);
+            board.DeleteFile(fileId);
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.ModelDeleted, boardId);
+        }
+
 
         [HubMethodName(BoardsHubContract.CoordsChanged)]
         public async Task SendCoords(string boardId, string coordsChangeDataJson)
@@ -62,6 +94,15 @@ namespace DndBoard.ServerCommon.Hubs
 
             await Clients.Group(boardId).SendAsync(BoardsHubContract.CoordsChanged, coordsChangeDataJson);
         }
+
+        [HubMethodName(BoardsHubContract.IconInstanceRemoved)]
+        public async Task SendIconInstanceRemoved(string boardId, string instanceId)
+        {
+            Board board = _boardsManager.GetBoard(boardId);
+            board.IconsInstances.RemoveAll(icon => icon.InstanceId == instanceId);
+            await Clients.Group(boardId).SendAsync(BoardsHubContract.IconInstanceRemoved, instanceId);
+        }
+
 
         [HubMethodName(BoardsHubContract.Connect)]
         public async Task Connect(string boardId)

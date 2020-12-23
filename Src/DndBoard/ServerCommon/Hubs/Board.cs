@@ -25,9 +25,11 @@ namespace DndBoard.ServerCommon.Hubs
             _files.Remove(fileId, out _);
         }
 
-        public void AddFile(byte[] file)
+        public string AddFile(byte[] file)
         {
-            _files.TryAdd(Guid.NewGuid().ToString(), file);
+            string id = Guid.NewGuid().ToString();
+            _files.TryAdd(id, file);
+            return id;
         }
 
         public IEnumerable<string> GetFilesIds()

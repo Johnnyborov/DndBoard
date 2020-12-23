@@ -1,5 +1,4 @@
 using System.Linq;
-using DndBoard.ClientCommon;
 using DndBoard.ClientCommon.Helpers;
 using DndBoard.ClientCommon.Store;
 using DndBoard.ServerCommon.Hubs;
@@ -32,7 +31,6 @@ namespace DndBoard.BlazorServer
 
             services.AddTransient<BoardsManager>();
             services.AddSignalR();
-            services.AddControllersWithViews().AddControllersAsServices();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
@@ -41,8 +39,6 @@ namespace DndBoard.BlazorServer
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                     new[] { "application/octet-stream" });
             });
-
-            services.AddTransient<IFilesClient, ServerFilesClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,7 +64,6 @@ namespace DndBoard.BlazorServer
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
                 endpoints.MapHub<BoardsHub>(BoardsHubContract.BaseAddress);
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");

@@ -9,7 +9,7 @@
 
 @foreach (var icon in _appState.IconsModels)
 {
-    <img @ref="icon.Ref" src="/api/images/getfile/@_boardId/@icon.ModelId" hidden/>
+    <img @ref="icon.Ref" src="@icon.Url" hidden/>
 }
 
 <div style="width: 700px; height: 700px; overflow-y: scroll;">

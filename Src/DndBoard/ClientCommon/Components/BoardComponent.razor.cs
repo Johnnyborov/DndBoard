@@ -16,18 +16,19 @@ namespace DndBoard.ClientCommon.Components
         [Inject] private AppState _appState { get; set; }
 
 
+        protected override async Task OnInitializedAsync()
+        {
+            _chatHubManager.SetupConnectionAsync();
+            _chatHubManager.SetConnectedHandler(ConnectedHanlder);
+            await _chatHubManager.StartConnectionAsync();
+            _appState.ChatHubManager = _chatHubManager;
+        }
+
         public async ValueTask DisposeAsync()
         {
             await _chatHubManager.CloseConnectionAsync();
         }
 
-        protected override async Task OnInitializedAsync()
-        {
-            _appState.ChatHubManager = _chatHubManager;
-            _chatHubManager.SetupConnectionAsync();
-            _chatHubManager.SetConnectedHandler(ConnectedHanlder);
-            await _chatHubManager.StartConnectionAsync();
-        }
 
         private async Task ConnectAsync()
         {

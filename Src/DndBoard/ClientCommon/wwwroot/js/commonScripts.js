@@ -7,17 +7,49 @@ function getElementOffsets(el) {
     return JSON.stringify(obj);
 }
 
+
+function createFileURL(fileContent) {
+    var blob = new Blob([base64ToArrayBuffer(fileContent)], { type: 'image/png' });
+    var url = URL.createObjectURL(blob);
+    return url;
+}
+
+function base64ToArrayBuffer(base64) {
+    var binaryString = window.atob(base64);
+    var binaryLen = binaryString.length;
+    var bytes = new Uint8Array(binaryLen);
+    for (var i = 0; i < binaryLen; i++) {
+        var ascii = binaryString.charCodeAt(i);
+        bytes[i] = ascii;
+    }
+    return bytes;
+}
+
+
 var iconsInstancesComponentInstance;
 function initIconsInstancesComponent(instance) {
     iconsInstancesComponentInstance = instance;
     window.requestAnimationFrame(redraw);
 }
-function redraw() {
-    iconsInstancesComponentInstance.invokeMethodAsync('Redraw');
+var iconsModelsComponentInstance;
+function initIconsModelsComponent(instance) {
+    iconsModelsComponentInstance = instance;
     window.requestAnimationFrame(redraw);
 }
-function clearMapCanvas() {
-    var mapCanvas = document.getElementById('IconsInstancesCanvasDiv').getElementsByTagName('canvas')[0];
+function redraw() {
+    iconsInstancesComponentInstance.invokeMethodAsync('Redraw');
+    iconsModelsComponentInstance.invokeMethodAsync('Redraw');
+    window.requestAnimationFrame(redraw);
+}
+
+function redrawAllImages(divCanvasId, imgList) {
+    clearMapCanvas(divCanvasId);
+    for (var i = 0; i < imgList.length; i++) {
+        redrawImage(divCanvasId, imgList[i].ref, imgList[i].x, imgList[i].y);
+    }
+}
+function clearMapCanvas(divCanvasId) {
+    var mapCanvas = document.getElementById(divCanvasId).getElementsByTagName('canvas')[0];
     var canvasW = mapCanvas.getBoundingClientRect().width;
     var canvasH = mapCanvas.getBoundingClientRect().height;
 
@@ -26,59 +58,8 @@ function clearMapCanvas() {
     ctx.fillStyle = 'rgb(0,200,0)';
     ctx.fillRect(0, 0, canvasW, canvasH);
 }
-function redrawImage(img, x, y) {
-    var mapCanvas = document.getElementById('IconsInstancesCanvasDiv').getElementsByTagName('canvas')[0];;
+function redrawImage(divCanvasId, img, x, y) {
+    var mapCanvas = document.getElementById(divCanvasId).getElementsByTagName('canvas')[0];;
     var ctx = mapCanvas.getContext('2d');
     ctx.drawImage(img, x, y);
 }
-function redrawAllImages(imgList) {
-    clearMapCanvas();
-    for (var i = 0; i < imgList.length; i++) {
-        redrawImage(imgList[i].ref, imgList[i].x, imgList[i].y);
-    }
-}
-
-/*
-var boardIdGlobal;
-var componentInstanceGlobal;
-function onInputChange(e) {
-    const fd = new FormData();
-    // add all selected files
-    Array.prototype.forEach.call(e.target.files, (file) => {
-        fd.append('file', file);
-    });
-    // create the request
-    const xhr = new XMLHttpRequest();
-    xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-            componentInstanceGlobal.invokeMethodAsync('ReloadFilesIds');
-        }
-    };
-
-    fd.append('boardId', boardIdGlobal);
-    // path to server would be where you'd normally post the form to
-    xhr.open('POST', '/Images/PostFiles', true);
-    xhr.send(fd);
-}
-function reinitializeFileInput(boardId, input, componentInstance) {
-    boardIdGlobal = boardId;
-    componentInstanceGlobal = componentInstance;
-    input.removeEventListener('change', onInputChange);
-    input.addEventListener('change', onInputChange);
-}
-
-        var img = document.querySelector('img')
-
-        function loaded() {
-            alert('loaded');
-        }
-
-        if (img.complete) {
-            loaded();
-        } else {
-            img.addEventListener('load', loaded);
-          img.addEventListener('error', function() {
-            alert('error')
-          });
-        }
-*/

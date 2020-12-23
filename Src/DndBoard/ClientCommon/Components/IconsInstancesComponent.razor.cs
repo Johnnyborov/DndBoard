@@ -18,6 +18,7 @@ namespace DndBoard.ClientCommon.Components
         [Inject] private CanvasMapRenderer _canvasMapRenderer { get; set; }
         [Inject] private IJSRuntime _jsRuntime { get; set; }
 
+
         private bool _initialized = false;
         protected override async Task OnInitializedAsync()
         {
@@ -26,15 +27,21 @@ namespace DndBoard.ClientCommon.Components
             else
                 _initialized = true;
 
-            _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
-            _appState.ChatHubManager.SetIconInstanceRemovedHandler(IconInstanceRemovedHandler);
+            _appState.BoardIdChanged += OnBoardIdChanged;
 
             await _jsRuntime.InvokeAsync<object>(
                 "initIconsInstancesComponent", DotNetObjectReference.Create(this)
             );
         }
 
-        
+        private Task OnBoardIdChanged(string boardId)
+        {
+            _appState.ChatHubManager.SetCoordsReceivedHandler(CoordsReceivedHandler);
+            _appState.ChatHubManager.SetIconInstanceRemovedHandler(IconInstanceRemovedHandler);
+            return Task.CompletedTask;
+        }
+
+
         private void IconInstanceRemovedHandler(string iconInstanceId)
         {
             _appState.IconsInstances.RemoveAll(icon => icon.InstanceId == iconInstanceId);
@@ -70,7 +77,7 @@ namespace DndBoard.ClientCommon.Components
             if (_appState.IconsInstances is null)
                 return;
 
-            await _canvasMapRenderer.RedrawIconsByCoordsJS(_jsRuntime, _appState.IconsInstances);
+            await _canvasMapRenderer.RedrawIconsByCoordsJS("IconsInstancesCanvasDiv", _jsRuntime, _appState.IconsInstances);
         }
 
         private async Task OnMouseMoveAsync(MouseEventArgs mouseEventArgs)
@@ -118,9 +125,9 @@ namespace DndBoard.ClientCommon.Components
 
         private async Task OnRightClick(MouseEventArgs mouseEventArgs)
         {
-            DndIconElem clickedImage = await GetClickedIcon(mouseEventArgs);
-            if (clickedImage is not null)
-                await _appState.ChatHubManager.SendIconInstanceRemoved(clickedImage.InstanceId);
+            DndIconElem clickedIcon = await GetClickedIcon(mouseEventArgs);
+            if (clickedIcon is not null)
+                await _appState.ChatHubManager.SendIconInstanceRemoved(clickedIcon.InstanceId);
         }
     }
 }
